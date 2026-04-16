@@ -9,97 +9,112 @@ gsap.registerPlugin(ScrollTrigger)
 
 const workItems = [
   {
-    title: 'Avalanche Nexus',
-    category: 'Web3 Platform',
+    title: 'LensCraft Portfolio',
+    category: 'Photography Platform',
     summary:
-      'Design and development for a blockchain gaming ecosystem with story-rich interactions.',
+      'A full-stack photography portfolio with dynamic galleries, EXIF filters, and lightning-fast image delivery.',
     gradient:
       'linear-gradient(140deg, #6ee7ff 0%, #2958ff 46%, #140f39 100%)',
   },
   {
-    title: 'Guild Protocol',
-    category: 'Campaign Site',
+    title: 'StackPulse Console',
+    category: 'SaaS Dashboard',
     summary:
-      'A launch website with deep navigation transitions and modular game content.',
+      'A modern analytics workspace built with React and Node.js for real-time product and infrastructure insights.',
     gradient:
       'linear-gradient(130deg, #ffca80 0%, #ff6e7a 48%, #3b1639 100%)',
   },
   {
-    title: 'Shrapnel Arena',
-    category: 'Immersive Landing',
+    title: 'Nomad Notes',
+    category: 'Cross-platform PWA',
     summary:
-      'High-contrast visuals and reactive sections built for competitive gameplay hype.',
+      'An offline-ready writing app synchronized across devices with clean UX, smart search, and cloud backup.',
     gradient:
       'linear-gradient(140deg, #6af7c0 0%, #15b79a 50%, #11302d 100%)',
   },
   {
-    title: 'My Pet Havoc',
-    category: 'Brand Experience',
+    title: 'Pixel Drift Stories',
+    category: 'Visual Storytelling',
     summary:
-      'An energetic microsite blending playful motion, bold typography, and custom UI.',
+      'A cinematic storytelling site mixing motion direction, typography, and photography to create high-impact narratives.',
     gradient:
       'linear-gradient(140deg, #ff9dd8 0%, #ff6979 45%, #2c1434 100%)',
   },
   {
-    title: 'Gods Circuit',
-    category: 'Game Narrative',
+    title: 'FlowOps Control Room',
+    category: 'Developer Platform',
     summary:
-      'A cinematic product journey with pinned scenes and layered card animations.',
+      'A scalable full-stack control panel with role-based access, workflow automation, and observability-first architecture.',
     gradient:
       'linear-gradient(140deg, #9fd0ff 0%, #6b7bff 50%, #181f4b 100%)',
   },
 ]
 
 const partnerNames = [
-  'Immutable',
-  'Avalanche',
-  'PlayStation',
-  'Ubisoft',
-  'Nillion',
-  'Shrapnel',
-  'Metalcore',
-  'KARRAT',
-  'Stardust',
-  'Pulsar',
+  'JavaScript',
+  'TypeScript',
+  'Php',
+  'React',
+  'Next.js',
+  'Node.js',
+  'SQL',
+  'GSAP',
+  'Android Studio',
+  'Lightroom',
+  'Photoshop',
+  'Claude',
+  'Copilot',
 ]
 
 const stackColumns = [
   {
-    title: 'Software engineering',
+    title: 'Full-stack engineering',
     groups: [
       {
-        label: 'Technology',
-        items: ['React / Next.js', 'SvelteKit', 'Node.js', 'Rust', 'Golang', 'Web3'],
+        label: 'Core stack',
+        items: [
+          'React / Next.js',
+          'Node.js / Express',
+          'TypeScript',
+          'PostgreSQL + MongoDB',
+          'REST + GraphQL',
+          'Cloud architecture',
+        ],
       },
       {
-        label: 'Patterns',
+        label: 'Shipping style',
         items: [
-          'Test-driven development',
-          'Event-driven architecture',
-          'Microservices',
-          'Atomic design',
-          'Central state management',
+          'Product-first delivery',
+          'Performance budgets',
+          'Scalable architecture',
+          'CI / CD pipelines',
+          'Observability and quality',
         ],
       },
     ],
   },
   {
-    title: 'Design',
+    title: 'Creative direction',
     groups: [
       {
-        label: 'Capabilities',
+        label: 'Experience craft',
         items: [
-          'Adaptive websites',
-          'UX / UI',
-          'Game interfaces',
-          'Motion design',
-          '3D + interaction design',
-          'Social media content',
+          'Web and mobile UX / UI',
+          'Design systems',
+          'Motion-led interactions',
+          'Brand-forward websites',
+          'Micro-interaction design',
+          'Creative prototyping',
         ],
       },
       {
-        label: 'Output',
-        items: ['Visual identity', 'Custom iconography', 'Pitch deck visuals', 'Marketing reels'],
+        label: 'Photography',
+        items: [
+          'Portrait and lifestyle shoots',
+          'Travel storytelling',
+          'Color grading',
+          'Social media visual packs',
+        ],
       },
     ],
   },
@@ -140,7 +155,11 @@ function App() {
 
       introTimelineRef.current = gsap
         .timeline({ paused: true, defaults: { ease: 'power3.out' } })
-        .from('.top-nav', { y: -60, opacity: 0, duration: 0.8 })
+        .fromTo(
+          '.top-nav',
+          { y: -60, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.8, immediateRender: false },
+        )
         .to(
           '.hero-title .char',
           {
@@ -185,43 +204,84 @@ function App() {
         })
       })
 
+      const setProjectsFocus = (isFocused) => {
+        document.body.classList.toggle('projects-focused', isFocused)
+      }
+
+      // Always reset first in case class persisted through HMR/refresh during dev.
+      setProjectsFocus(false)
+
       mm.add('(min-width: 900px)', () => {
         const track = document.querySelector('.work-track')
-        if (!track) {
+        const workPin = document.querySelector('.work-pin')
+        if (!track || !workPin) {
           return
         }
 
         const getMaxShift = () =>
           Math.max(0, track.scrollWidth - window.innerWidth + window.innerWidth * 0.12)
 
+        const getPinDistance = () => getMaxShift() + window.innerHeight * 0.6
+
         gsap.to(track, {
           x: () => -getMaxShift(),
           ease: 'none',
           scrollTrigger: {
-            trigger: '.work-pin',
+            trigger: workPin,
             start: 'top top',
-            end: () => `+=${getMaxShift() + window.innerHeight * 0.6}`,
+            end: () => `+=${getPinDistance()}`,
             scrub: 1,
             pin: true,
             invalidateOnRefresh: true,
             anticipatePin: 1,
+            onToggle: (self) => {
+              setProjectsFocus(self.isActive)
+            },
           },
         })
+
+        return () => {
+          setProjectsFocus(false)
+        }
       })
 
-      mm.add('(max-width: 899px)', () => {
-        gsap.from('.work-card', {
-          y: 50,
-          opacity: 0,
-          stagger: 0.12,
-          duration: 0.82,
-          ease: 'power3.out',
+      gsap
+        .timeline({
+          defaults: { ease: 'power3.out' },
           scrollTrigger: {
-            trigger: '.work-track',
-            start: 'top 85%',
+            trigger: '.projects-section',
+            start: 'top 72%',
+            toggleActions: 'restart none none reverse',
           },
         })
-      })
+        .from('.projects-heading h2', {
+          y: 86,
+          opacity: 0,
+          clipPath: 'inset(0 0 100% 0)',
+          duration: 0.95,
+        })
+        .from(
+          '.projects-heading p',
+          {
+            y: 36,
+            opacity: 0,
+            duration: 0.62,
+          },
+          '-=0.48',
+        )
+        .from(
+          '.projects-section .work-card',
+          {
+            y: 110,
+            opacity: 0,
+            scale: 0.94,
+            filter: 'blur(10px)',
+            stagger: 0.1,
+            duration: 0.9,
+            clearProps: 'filter',
+          },
+          '-=0.2',
+        )
 
       gsap.to('.marquee__inner', {
         xPercent: -50,
@@ -230,6 +290,35 @@ function App() {
         repeat: -1,
       })
     }, appRef)
+
+    const inPageLinks = Array.from(document.querySelectorAll('a[href^="#"]')).filter((link) =>
+      link.getAttribute('href')?.length > 1,
+    )
+
+    const handleAnchorNavigation = (event) => {
+      const href = event.currentTarget.getAttribute('href')
+      if (!href) {
+        return
+      }
+
+      const target = document.querySelector(href)
+      if (!target) {
+        return
+      }
+
+      event.preventDefault()
+      const navHeight = document.querySelector('.top-nav')?.getBoundingClientRect().height ?? 0
+
+      lenis.scrollTo(target, {
+        offset: -(navHeight + 24),
+        duration: 1.05,
+        easing: (value) => 1 - Math.pow(1 - value, 3),
+      })
+    }
+
+    inPageLinks.forEach((link) => {
+      link.addEventListener('click', handleAnchorNavigation)
+    })
 
     const magneticButton = magneticButtonRef.current
     const handleMove = (event) => {
@@ -262,6 +351,10 @@ function App() {
     magneticButton?.addEventListener('mouseleave', handleLeave)
 
     return () => {
+      inPageLinks.forEach((link) => {
+        link.removeEventListener('click', handleAnchorNavigation)
+      })
+      document.body.classList.remove('projects-focused')
       magneticButton?.removeEventListener('mousemove', handleMove)
       magneticButton?.removeEventListener('mouseleave', handleLeave)
       cancelAnimationFrame(rafId)
@@ -282,6 +375,7 @@ function App() {
     }
 
     document.body.classList.remove('is-locked')
+    gsap.set('.top-nav', { opacity: 1, y: 0 })
 
     gsap.timeline({ defaults: { ease: 'power4.inOut' } })
       .to('.preloader__panel', { yPercent: -110, duration: 1.1 })
@@ -299,10 +393,19 @@ function App() {
     <main className="page-shell" ref={appRef}>
       <div className="preloader" aria-hidden={experienceStarted}>
         <div className="preloader__panel">
-          <p className="preloader__tag">WonderForge Interactive</p>
-          <h2>WONDER GAMES</h2>
+          <p className="preloader__tag">Independent Creator Profile</p>
+          <h2>HPX.DEV</h2>
+          <p className="preloader__note">
+            Full-stack developer, tech enthusiast, and photographer building seamless web and app
+            experiences with an eye for detail.
+          </p>
+          <div className="preloader__meta" aria-hidden="true">
+            <span>Code</span>
+            <span>Design</span>
+            <span>Photography</span>
+          </div>
           <button className="btn btn--primary" onClick={() => setExperienceStarted(true)}>
-            Start loading
+            Enter portfolio
           </button>
         </div>
       </div>
@@ -313,41 +416,44 @@ function App() {
         <span className="orb orb--c" data-float="160"></span>
       </div>
 
+      <div className="cinematic-mask" aria-hidden="true"></div>
+
       <header className="top-nav">
         <div className="brand-mark">
           <span className="brand-star"></span>
-          <span>WonderForge</span>
+          <span>HPX.DEV</span>
         </div>
         <nav>
-          <a href="#work">Our work</a>
-          <a href="#services">Services</a>
+          <a href="#work">Projects</a>
+          <a href="#services">Expertise</a>
           <a href="#contact">Contact</a>
         </nav>
         <div className="status-pill">
           <span className="status-pill__dot"></span>
-          AUDIO ONLINE 60 FPS
+          AVAILABLE FOR NEW BUILDS
         </div>
       </header>
 
       <section className="section hero" id="home">
-        <p className="hero-kicker">Your dedicated partner in the gaming industry</p>
+        <p className="hero-kicker">Full-stack developer, tech explorer, visual storyteller</p>
         <h1 className="hero-title" data-split>
-          WONDER GAMES
+          HPX.DEV
         </h1>
         <p className="hero-copy">
-          You do not need a cheat code. You need a team that takes initiative, defends your
-          product, and builds digital worlds players remember.
+          I am Harmanpreet Singh, a full-stack developer who loves exploring every tech stack to craft seamless,
+          high-performance websites and app experiences. I also bring a photographer&apos;s eye to
+          every interface, balancing engineering precision with visual emotion.
         </p>
         <div className="hero-actions">
           <button className="btn btn--primary" ref={magneticButtonRef}>
-            Enter the game
+            View projects
           </button>
           <a className="btn btn--ghost" href="#work">
-            Play demo
+            See case studies
           </a>
         </div>
         <ul className="skills-row">
-          {['Animation', '3D', 'Website', 'Web3', 'Game UX/UI'].map((skill) => (
+          {['Full-stack', 'React', 'Node.js', 'Cloud', 'Mobile UX', 'Photography'].map((skill) => (
             <li className="skill-pill" key={skill}>
               {skill}
             </li>
@@ -357,44 +463,45 @@ function App() {
 
       <section className="section statement" data-reveal>
         <p>
-          Our job is simple: craft digital experiences that take players far beyond what they
-          came for.
+          I build products that feel fast, look intentional, and tell stories users remember.
         </p>
       </section>
 
-      <section className="section section-head" id="work" data-reveal>
-        <h2>Our work</h2>
-        <p>
-          Motion-first campaign websites and product experiences for game studios, publishers, and
-          Web3 platforms.
-        </p>
-      </section>
+      <section className="projects-section" id="work">
+        <div className="work-pin">
+          <div className="section section-head projects-heading">
+            <h2>Featured projects</h2>
+            <p>
+              Selected builds across SaaS, portfolios, and product platforms where engineering and
+              design move as one.
+            </p>
+          </div>
 
-      <section className="work-pin">
-        <div className="work-track">
-          {workItems.map((item) => (
-            <article
-              className="work-card"
-              key={item.title}
-              style={{ '--card-gradient': item.gradient }}
-            >
-              <div className="work-card__visual" aria-hidden="true">
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
-              <p className="work-card__category">{item.category}</p>
-              <h3>{item.title}</h3>
-              <p>{item.summary}</p>
-              <a href="#contact">Learn more</a>
-            </article>
-          ))}
+          <div className="work-track">
+            {workItems.map((item) => (
+              <article
+                className="work-card"
+                key={item.title}
+                style={{ '--card-gradient': item.gradient }}
+              >
+                <div className="work-card__visual" aria-hidden="true">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+                <p className="work-card__category">{item.category}</p>
+                <h3>{item.title}</h3>
+                <p>{item.summary}</p>
+                <a href="#contact">Open case study</a>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
 
       <section className="section partners" data-reveal>
-        <h2>We partner with industry leaders</h2>
-        <p>Their trust in our capabilities makes us super proud.</p>
+        <h2>Stack in daily rotation</h2>
+        <p>Technologies and tools I rely on to ship polished digital experiences.</p>
         <div className="marquee" aria-label="Partner list">
           <div className="marquee__inner">
             {[...partnerNames, ...partnerNames].map((name, index) => (
@@ -405,8 +512,8 @@ function App() {
       </section>
 
       <section className="section services" id="services" data-reveal>
-        <h2>Services</h2>
-        <p>You have one quest. We make it count.</p>
+        <h2>Capabilities</h2>
+        <p>From product strategy to production-ready code and visual storytelling.</p>
         <div className="services-grid">
           {stackColumns.map((column) => (
             <article className="service-card" key={column.title}>
@@ -427,14 +534,22 @@ function App() {
       </section>
 
       <section className="section contact" id="contact" data-reveal>
-        <p className="contact-kicker">Let&apos;s join forces</p>
-        <h2>As long as there is room to turn things up a notch, we are in.</h2>
-        <a className="btn btn--primary" href="mailto:team@wonderforge.games">
+        <p className="contact-kicker">Let&apos;s build something sharp</p>
+        <h2>I partner with teams that care about performance, craft, and memorable user impact.</h2>
+        <a className="btn btn--primary" href="mailto:yournamepleaseplease@gmail.com">
           Get in touch
         </a>
         <div className="contact-meta">
-          <a href="mailto:team@wonderforge.games">team@wonderforge.games</a>
-          <span>Prague, Czech Republic</span>
+          <a href="https://github.com/hpx07" target="_blank" rel="noopener noreferrer">
+            Click for Github
+          </a>
+          <a
+            href="https://www.google.com/maps?q=31.9502,75.6175"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            31.9622° N, 75.6185° E, Panjab 
+          </a>
         </div>
       </section>
     </main>
