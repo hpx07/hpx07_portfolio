@@ -1,0 +1,73 @@
+:root {
+  --bg: #070b16;
+  --bg-soft: #0d1328;
+  --ink: #f4f7ff;
+  --muted: #9aa7c9;
+  --muted-soft: #b8c3e0;
+  --line: rgba(255, 255, 255, 0.15);
+  --line-strong: rgba(255, 255, 255, 0.3);
+  --sky: #7ce8ff;
+  --orange: #ff8e5b;
+  --font-display: 'Antonio', 'Impact', sans-serif;
+  --font-body: 'Space Grotesk', 'Trebuchet MS', sans-serif;
+
+  font-family: var(--font-body);
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--ink);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100svh;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 15% 0%, #111c44 0%, transparent 50%),
+    radial-gradient(circle at 86% 26%, #2f1a37 0%, transparent 45%),
+    linear-gradient(180deg, var(--bg-soft) 0%, var(--bg) 40%, #05070f 100%);
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.09) 0.7px, transparent 0.7px);
+  background-size: 3px 3px;
+  opacity: 0.08;
+  z-index: -1;
+}
+
+body.is-locked {
+  overflow: hidden;
+}
+
+#root {
+  min-height: 100svh;
+}
+
+a,
+button {
+  font: inherit;
+  color: inherit;
+}
+
+@media (max-width: 1080px) {
+  :root {
+    font-size: 16px;
+  }
+}
