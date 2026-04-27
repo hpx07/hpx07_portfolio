@@ -126,6 +126,9 @@ function App() {
   const magneticButtonRef = useRef(null)
   const introTimelineRef = useRef(null)
   const splitRef = useRef(null)
+  const preloaderTitleRef = useRef(null)
+  const smokeRef = useRef(null)
+  const lenisRef = useRef(null)
 
   useEffect(() => {
     const lenis = new Lenis({
@@ -134,6 +137,9 @@ function App() {
       wheelMultiplier: 0.85,
       normalizeWheel: true,
     })
+    lenisRef.current = lenis
+    // Start stopped — unlock after intro transition completes
+    lenis.stop()
 
     let rafId = 0
     const raf = (time) => {
@@ -358,6 +364,7 @@ function App() {
       magneticButton?.removeEventListener('mousemove', handleMove)
       magneticButton?.removeEventListener('mouseleave', handleLeave)
       cancelAnimationFrame(rafId)
+      lenisRef.current = null
       lenis.destroy()
       mm.revert()
       splitRef.current?.revert()
@@ -370,19 +377,148 @@ function App() {
       document.body.classList.add('is-locked')
       gsap.set('.preloader', { autoAlpha: 1, pointerEvents: 'auto' })
       gsap.set('.preloader__panel', { yPercent: 0 })
+      gsap.set('.smoke-overlay', { opacity: 0 })
       introTimelineRef.current?.pause(0)
+      // Keep Lenis stopped while preloader is active
+      lenisRef.current?.stop()
       return
     }
 
-    document.body.classList.remove('is-locked')
-    gsap.set('.top-nav', { opacity: 1, y: 0 })
+    // Ensure page is scrolled to top before transition
+    window.scrollTo(0, 0)
 
-    gsap.timeline({ defaults: { ease: 'power4.inOut' } })
-      .to('.preloader__panel', { yPercent: -110, duration: 1.1 })
-      .to('.preloader', { autoAlpha: 0, pointerEvents: 'none', duration: 0.2 }, '-=0.15')
-      .add(() => {
-        introTimelineRef.current?.play(0)
+    // --- REVERSE FLIP: animate the HERO title from the preloader's position ---
+    // This keeps text at native resolution (no bitmap scaling blur)
+    const preTitle = preloaderTitleRef.current
+    const heroTitle = document.querySelector('.hero-title')
+    if (!preTitle || !heroTitle) return
+
+    const preRect = preTitle.getBoundingClientRect()
+    const heroRect = heroTitle.getBoundingClientRect()
+
+    // How much to scale the hero title DOWN so it matches the preloader title size
+    const invertScale = preRect.width / heroRect.width
+
+    // Where the preloader title center is relative to the hero title center
+    const invertX = (preRect.left + preRect.width / 2) - (heroRect.left + heroRect.width / 2)
+    const invertY = (preRect.top + preRect.height / 2) - (heroRect.top + heroRect.height / 2)
+
+    const smokeEl = smokeRef.current
+    const smokeRings = smokeEl?.querySelectorAll('.smoke-ring')
+
+    // Prepare: show hero title at the preloader's position/size, hide preloader title
+    gsap.set('.hero-title .char', { yPercent: 0, opacity: 1 })
+    gsap.set('.hero-title', {
+      visibility: 'visible',
+      opacity: 1,
+      scale: invertScale,
+      x: invertX,
+      y: invertY,
+      transformOrigin: 'center center',
+    })
+    gsap.set(
+      ['.top-nav', '.hero-kicker', '.hero-copy', '.hero-actions .btn', '.skill-pill', '.status-pill'],
+      { opacity: 0, y: 24 },
+    )
+
+    const tl = gsap.timeline({
+      defaults: { ease: 'power3.out' },
+      onComplete: () => {
+        // Clean up: reset hero title inline transforms
+        gsap.set('.hero-title', { clearProps: 'transform,x,y,scale,transformOrigin' })
+        gsap.set('.preloader', { autoAlpha: 0, pointerEvents: 'none' })
+        gsap.set('.smoke-overlay', { opacity: 0 })
+        document.querySelector('.preloader__panel')?.classList.remove('panel--fading')
+        document.querySelector('.preloader')?.classList.remove('preloader--fading')
+        // Unlock scroll
+        document.body.classList.remove('is-locked')
+        lenisRef.current?.start()
+      },
+    })
+
+    // ── PHASE 1 — DISSOLVE CARD (0 → 0.4s) ──
+    // Fade out everything in the preloader (including the preloader h2 — hero title is now visible behind it)
+    tl.to(
+      ['.preloader__tag', '.preloader__note', '.preloader__meta', '.preloader__panel .btn'],
+      { opacity: 0, duration: 0.3, ease: 'power2.out' },
+      0,
+    )
+    // Fade out preloader title (hero title is already in its place)
+    tl.to(preTitle, { opacity: 0, duration: 0.25, ease: 'power2.out' }, 0.15)
+    // Dissolve card chrome
+    tl.to(
+      '.preloader__panel',
+      {
+        borderColor: 'rgba(255,255,255,0)',
+        background: 'rgba(0,0,0,0)',
+        boxShadow: '0 0 0 rgba(0,0,0,0)',
+        duration: 0.35,
+        ease: 'power2.out',
+      },
+      0,
+    )
+    tl.add(() => {
+      document.querySelector('.preloader__panel')?.classList.add('panel--fading')
+      document.querySelector('.preloader')?.classList.add('preloader--fading')
+    }, 0)
+    // Fade preloader backdrop
+    tl.to(
+      '.preloader',
+      { background: 'rgba(3, 6, 16, 0)', backdropFilter: 'blur(0px)', duration: 0.45, ease: 'power2.out' },
+      0.05,
+    )
+
+    // ── PHASE 2 — SMOKE + HERO TITLE SCALES TO NATIVE SIZE (0.2 → 0.9s) ──
+    // Animate hero title from preloader position/size to its native position/size
+    tl.to(
+      '.hero-title',
+      { scale: 1, x: 0, y: 0, duration: 0.7, ease: 'power2.inOut' },
+      0.2,
+    )
+
+    // Smoke: GSAP-driven scale+opacity
+    if (smokeRings && smokeRings.length) {
+      tl.to(smokeEl, { opacity: 1, duration: 0.15 }, 0.25)
+
+      smokeRings.forEach((ring, i) => {
+        tl.fromTo(
+          ring,
+          { scale: 0, opacity: 0 },
+          {
+            scale: 2.5 + i * 0.5,
+            opacity: 0.85,
+            duration: 0.5,
+            ease: 'power2.out',
+          },
+          0.28 + i * 0.06,
+        )
+        tl.to(
+          ring,
+          { opacity: 0, scale: 3 + i * 0.6, duration: 0.4, ease: 'power1.in' },
+          0.55 + i * 0.05,
+        )
       })
+
+      tl.to(smokeEl, { opacity: 0, duration: 0.3, ease: 'power2.out' }, 0.8)
+    }
+
+    // ── PHASE 3 — HERO ELEMENTS STAGGER IN (0.7 → 1.4s) ──
+    const heroEls = [
+      document.querySelector('.top-nav'),
+      document.querySelector('.hero-kicker'),
+      document.querySelector('.hero-copy'),
+      ...document.querySelectorAll('.hero-actions .btn'),
+      ...document.querySelectorAll('.skill-pill'),
+      document.querySelector('.status-pill'),
+    ].filter(Boolean)
+
+    heroEls.forEach((el, i) => {
+      tl.to(
+        el,
+        { opacity: 1, y: 0, duration: 0.45, ease: 'power4.out' },
+        0.75 + i * 0.07,
+      )
+    })
 
     return () => {
       document.body.classList.remove('is-locked')
@@ -394,7 +530,7 @@ function App() {
       <div className="preloader" aria-hidden={experienceStarted}>
         <div className="preloader__panel">
           <p className="preloader__tag">Independent Creator Profile</p>
-          <h2>HPX.DEV</h2>
+          <h2 ref={preloaderTitleRef}>HPX.DEV</h2>
           <p className="preloader__note">
             Full-stack developer, tech enthusiast, and photographer building seamless web and app
             experiences with an eye for detail.
@@ -408,6 +544,12 @@ function App() {
             Enter portfolio
           </button>
         </div>
+      </div>
+
+      <div className="smoke-overlay" ref={smokeRef} aria-hidden="true">
+        <div className="smoke-ring smoke-ring--1"></div>
+        <div className="smoke-ring smoke-ring--2"></div>
+        <div className="smoke-ring smoke-ring--3"></div>
       </div>
 
       <div className="ambient-layer" aria-hidden="true">
