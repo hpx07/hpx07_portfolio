@@ -1065,10 +1065,37 @@ body:not(.projects-focused) .top-nav {
   .top-nav {
     position: sticky;
     top: 0.7rem;
+    gap: 0.55rem;
+    padding: 0.56rem 0.68rem;
   }
 
   .top-nav nav {
+    display: inline-flex;
+    flex: 1;
+    justify-content: flex-end;
+    gap: 0.35rem;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .top-nav nav::-webkit-scrollbar {
     display: none;
+  }
+
+  .top-nav nav a {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    letter-spacing: 0.12em;
+    font-size: 0.66rem;
+    padding: 0.38rem 0.58rem;
+  }
+
+  .brand-mark {
+    flex: 0 0 auto;
+    font-size: 0.84rem;
+    letter-spacing: 0.06em;
   }
 
   .hero {
@@ -1114,9 +1141,20 @@ body:not(.projects-focused) .top-nav {
     background: transparent;
     backdrop-filter: none;
   }
+
+  .partners {
+    padding-top:14svh;
+    margin-top: 2.25rem;
+  }
 }
 
 @media (max-width: 640px) {
+  .top-nav nav a {
+    font-size: 0.62rem;
+    letter-spacing: 0.09em;
+    padding: 0.34rem 0.48rem;
+  }
+
   .preloader {
     padding: 0.85rem;
   }
