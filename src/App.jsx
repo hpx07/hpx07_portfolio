@@ -120,6 +120,7 @@ function getIsLowEnd() {
 function App() {
   const [experienceStarted, setExperienceStarted] = useState(false)
   const appRef = useRef(null)
+  const cursorLightRef = useRef(null)
   const magneticButtonRef = useRef(null)
   const introTimelineRef = useRef(null)
   const splitRef = useRef(null)
@@ -386,6 +387,48 @@ function App() {
     }
   }, [])
 
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    const cursorLight = cursorLightRef.current
+    if (!cursorLight) {
+      return
+    }
+
+    const supportsFinePointer = window.matchMedia('(pointer: fine)').matches
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (!supportsFinePointer || prefersReducedMotion) {
+      return
+    }
+
+    const xTo = gsap.quickTo(cursorLight, 'x', { duration: 0.22, ease: 'power3.out' })
+    const yTo = gsap.quickTo(cursorLight, 'y', { duration: 0.22, ease: 'power3.out' })
+
+    const handlePointerMove = (event) => {
+      cursorLight.classList.add('cursor-soft-light--visible')
+      xTo(event.clientX)
+      yTo(event.clientY)
+    }
+
+    const handlePointerOut = (event) => {
+      if (event.relatedTarget) {
+        return
+      }
+
+      cursorLight.classList.remove('cursor-soft-light--visible')
+    }
+
+    window.addEventListener('pointermove', handlePointerMove, { passive: true })
+    window.addEventListener('pointerout', handlePointerOut)
+
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove)
+      window.removeEventListener('pointerout', handlePointerOut)
+    }
+  }, [])
+
   // Low-end detection + expertise will-change management
   useEffect(() => {
     const lowEnd = getIsLowEnd()
@@ -572,6 +615,8 @@ function App() {
 
   return (
     <main className="page-shell" ref={appRef}>
+      <div className="cursor-soft-light" ref={cursorLightRef} aria-hidden="true"></div>
+
       <div className="preloader" aria-hidden={experienceStarted}>
         <div className="preloader__panel">
           <p className="preloader__tag">Independent Creator Profile</p>
