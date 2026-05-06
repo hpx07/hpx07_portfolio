@@ -3,55 +3,71 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from '@studio-freight/lenis'
 import SplitType from 'split-type'
+import FloatingLines from '@/components/FloatingLines/FloatingLines'
 import './App.css'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const workItems = [
+const featuredProjects = [
   {
     title: 'LensCraft Portfolio',
     category: 'Photography Platform',
-    summary:
-      'A full-stack photography portfolio with dynamic galleries, EXIF filters, and lightning-fast image delivery.',
-    gradient:
-      'linear-gradient(140deg, #6ee7ff 0%, #2958ff 46%, #140f39 100%)',
-    image: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=600&h=400&fit=crop',
+    description:
+      'A full-stack photography portfolio with dynamic galleries, EXIF filters, and edge-optimized delivery built for fast loads.',
+    technologies: ['React', 'Vite', 'Node.js', 'Cloudinary', 'PostgreSQL'],
+    problems: [
+      'Large image libraries felt slow on mobile networks',
+      'Editors needed filters by camera, lens, and location metadata',
+      'Uploads had to be safe without blocking the editing flow',
+    ],
   },
   {
     title: 'StackPulse Console',
     category: 'SaaS Dashboard',
-    summary:
-      'A modern analytics workspace built with React and Node.js for real-time product and infrastructure insights.',
-    gradient:
-      'linear-gradient(130deg, #ffca80 0%, #ff6e7a 48%, #3b1639 100%)',
-    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop',
+    description:
+      'A real-time analytics workspace for product, infrastructure, and growth metrics with composable dashboards.',
+    technologies: ['React', 'TypeScript', 'Node.js', 'WebSockets', 'Redis'],
+    problems: [
+      'Streaming telemetry had to stay reliable under load',
+      'High-density data needed to remain scannable and calm',
+      'Access control needed to scale across teams and roles',
+    ],
   },
   {
     title: 'Nomad Notes',
     category: 'Cross-platform PWA',
-    summary:
-      'An offline-ready writing app synchronized across devices with clean UX, smart search, and cloud backup.',
-    gradient:
-      'linear-gradient(140deg, #6af7c0 0%, #15b79a 50%, #11302d 100%)',
-    image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&h=400&fit=crop',
+    description:
+      'An offline-first writing app with fast search, synced drafts, and a distraction-free reading mode.',
+    technologies: ['React', 'Service Workers', 'IndexedDB', 'Firebase', 'Tailwind'],
+    problems: [
+      'Notes had to be available without a network connection',
+      'Search needed to feel instant across thousands of entries',
+      'Sync conflicts had to resolve without data loss',
+    ],
   },
   {
     title: 'Pixel Drift Stories',
     category: 'Visual Storytelling',
-    summary:
-      'A cinematic storytelling site mixing motion direction, typography, and photography to create high-impact narratives.',
-    gradient:
-      'linear-gradient(140deg, #ff9dd8 0%, #ff6979 45%, #2c1434 100%)',
-    image: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=600&h=400&fit=crop',
+    description:
+      'A cinematic storytelling site mixing motion direction, typography, and photography to deliver immersive narratives.',
+    technologies: ['Next.js', 'GSAP', 'Three.js', 'Contentful', 'Vercel'],
+    problems: [
+      'Animation needed to feel rich without blocking scroll',
+      'Large media had to stream quickly on slower devices',
+      'Editors needed a simple workflow for new stories',
+    ],
   },
   {
     title: 'FlowOps Control Room',
     category: 'Developer Platform',
-    summary:
-      'A scalable full-stack control panel with role-based access, workflow automation, and observability-first architecture.',
-    gradient:
-      'linear-gradient(140deg, #9fd0ff 0%, #6b7bff 50%, #181f4b 100%)',
-    image: 'https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=600&h=400&fit=crop',
+    description:
+      'A scalable operations hub with workflow automation, observability tooling, and role-based controls.',
+    technologies: ['React', 'Node.js', 'PostgreSQL', 'Docker', 'Grafana'],
+    problems: [
+      'Teams needed a single pane of glass for incidents',
+      'Automations had to be auditable and easy to edit',
+      'On-call handoffs required clear, live status',
+    ],
   },
 ]
 
@@ -129,6 +145,8 @@ function App() {
   const lenisRef = useRef(null)
   const expertiseStackRef = useRef(null)
   const [isLowEnd, setIsLowEnd] = useState(false)
+  const [activeProjectIndex, setActiveProjectIndex] = useState(0)
+  const activeProject = featuredProjects[activeProjectIndex] ?? featuredProjects[0]
 
   const handleSectionNavigation = (event) => {
     const href = event.currentTarget.getAttribute('href')
@@ -181,7 +199,6 @@ function App() {
 
     lenis.on('scroll', ScrollTrigger.update)
 
-    const mm = gsap.matchMedia()
     const ctx = gsap.context(() => {
       splitRef.current = new SplitType('[data-split]', { types: 'chars' })
 
@@ -241,47 +258,6 @@ function App() {
         })
       })
 
-      const setProjectsFocus = (isFocused) => {
-        document.body.classList.toggle('projects-focused', isFocused)
-      }
-
-      // Always reset first in case class persisted through HMR/refresh during dev.
-      setProjectsFocus(false)
-
-      mm.add('(min-width: 900px)', () => {
-        const track = document.querySelector('.work-track')
-        const workPin = document.querySelector('.work-pin')
-        if (!track || !workPin) {
-          return
-        }
-
-        const getMaxShift = () =>
-          Math.max(0, track.scrollWidth - window.innerWidth + window.innerWidth * 0.12)
-
-        const getPinDistance = () => getMaxShift() + window.innerHeight * 0.6
-
-        const horizontalST = gsap.to(track, {
-          x: () => -getMaxShift(),
-          ease: 'none',
-          scrollTrigger: {
-            trigger: workPin,
-            start: 'top top',
-            end: () => `+=${getPinDistance()}`,
-            scrub: 1,
-            pin: true,
-            invalidateOnRefresh: true,
-            anticipatePin: 1,
-            onToggle: (self) => {
-              setProjectsFocus(self.isActive)
-            },
-          },
-        })
-
-        return () => {
-          setProjectsFocus(false)
-        }
-      })
-
       gsap
         .timeline({
           defaults: { ease: 'power3.out' },
@@ -302,15 +278,23 @@ function App() {
           '-=0.5',
         )
         .from(
-          '.projects-section .work-card',
+          '.project-nav__item',
           {
-            y: 80,
+            y: 50,
             opacity: 0,
-            scale: 0.96,
-            stagger: 0.08,
-            duration: 0.8,
+            stagger: 0.06,
+            duration: 0.6,
           },
           '-=0.3',
+        )
+        .from(
+          '.project-detail',
+          {
+            y: 50,
+            opacity: 0,
+            duration: 0.7,
+          },
+          '-=0.45',
         )
 
       gsap.to('.marquee__inner', {
@@ -375,13 +359,11 @@ function App() {
     magneticButton?.addEventListener('mouseleave', handleLeave)
 
     return () => {
-      document.body.classList.remove('projects-focused')
       magneticButton?.removeEventListener('mousemove', handleMove)
       magneticButton?.removeEventListener('mouseleave', handleLeave)
       cancelAnimationFrame(rafId)
       lenisRef.current = null
       lenis.destroy()
-      mm.revert()
       splitRef.current?.revert()
       ctx.revert()
     }
@@ -428,6 +410,21 @@ function App() {
       window.removeEventListener('pointerout', handlePointerOut)
     }
   }, [])
+
+  useEffect(() => {
+    if (experienceStarted) {
+      return
+    }
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Enter') {
+        setExperienceStarted(true)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [experienceStarted])
 
   // Low-end detection + expertise will-change management
   useEffect(() => {
@@ -527,7 +524,7 @@ function App() {
     // ── PHASE 1 — DISSOLVE CARD (0 → 0.4s) ──
     // Fade out everything in the preloader (including the preloader h2 — hero title is now visible behind it)
     tl.to(
-      ['.preloader__tag', '.preloader__note', '.preloader__meta', '.preloader__panel .btn'],
+      ['.preloader__header', '.preloader__note', '.preloader__stats', '.preloader__cta'],
       { opacity: 0, duration: 0.3, ease: 'power2.out' },
       0,
     )
@@ -617,22 +614,58 @@ function App() {
     <main className="page-shell" ref={appRef}>
       <div className="cursor-soft-light" ref={cursorLightRef} aria-hidden="true"></div>
 
+      <div className="floating-lines-bg" aria-hidden="true">
+        <div
+          className="floating-lines-bg__inner"
+          style={{
+            width: 'max(1080px, 120vmax)',
+            height: 'max(1080px, 120vmax)',
+            position: 'relative',
+          }}
+        >
+          <FloatingLines
+            linesGradient={['#E945F5', '#2F4BC0', '#E945F5']}
+            animationSpeed={1.7}
+            interactive
+            bendRadius={5}
+            bendStrength={-0.5}
+            mouseDamping={0.05}
+            parallax
+            parallaxStrength={0.2}
+          />
+        </div>
+      </div>
+
       <div className="preloader" aria-hidden={experienceStarted}>
-        <div className="preloader__panel">
-          <p className="preloader__tag">Independent Creator Profile</p>
+        <div className="preloader__panel preloader__panel--intro">
+          <div className="preloader__header">
+            <span className="preloader__signal" aria-hidden="true"></span>
+            <p className="preloader__tag">Independent Creator Profile</p>
+          </div>
           <h2 ref={preloaderTitleRef}>HPX.DEV</h2>
           <p className="preloader__note">
             Full-stack developer, tech enthusiast, and photographer building seamless web and app
             experiences with an eye for detail.
           </p>
-          <div className="preloader__meta" aria-hidden="true">
-            <span>Code</span>
-            <span>Design</span>
-            <span>Photography</span>
+          <div className="preloader__cta">
+            <button className="btn btn--primary" onClick={() => setExperienceStarted(true)}>
+              Enter portfolio
+            </button>
           </div>
-          <button className="btn btn--primary" onClick={() => setExperienceStarted(true)}>
-            Enter portfolio
-          </button>
+          <div className="preloader__stats" aria-hidden="true">
+            <div>
+              <span>Focus</span>
+              <strong>Full-stack</strong>
+            </div>
+            <div>
+              <span>Mode</span>
+              <strong>Design + Code</strong>
+            </div>
+            <div>
+              <span>Based</span>
+              <strong>Panjab, IN</strong>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -700,33 +733,72 @@ function App() {
       </section>
 
       <section className="projects-section" id="work">
-        <div className="work-pin">
-          <div className="section section-head projects-heading">
-            <h2>Featured projects</h2>
-            <p>
-              Selected builds across SaaS, portfolios, and product platforms where engineering and
-              design move as one.
-            </p>
+        <div className="section section-head projects-heading">
+          <h2>Featured projects</h2>
+          <p>
+            Selected builds across SaaS, portfolios, and product platforms where engineering and
+            design move as one.
+          </p>
+        </div>
+
+        <div className="section featured-projects">
+          <div className="project-nav">
+            <p className="project-nav__label">Selected work</p>
+            <ul className="project-nav__list" role="tablist" aria-label="Featured projects">
+              {featuredProjects.map((project, index) => {
+                const isActive = index === activeProjectIndex
+                return (
+                  <li key={project.title}>
+                    <button
+                      type="button"
+                      className={`project-nav__item ${isActive ? 'is-active' : ''}`}
+                      onClick={() => setActiveProjectIndex(index)}
+                      role="tab"
+                      id={`project-tab-${index}`}
+                      aria-selected={isActive}
+                      aria-controls={`project-panel-${index}`}
+                    >
+                      <span className="project-nav__dot" aria-hidden="true"></span>
+                      <span className="project-nav__copy">
+                        <span className="project-nav__title">{project.title}</span>
+                        <span className="project-nav__meta">{project.category}</span>
+                      </span>
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
           </div>
 
-          <div className="work-track">
-            {workItems.map((item) => (
-              <article
-                className="work-card"
-                key={item.title}
-                style={{ '--card-gradient': item.gradient }}
-              >
-                <div className="work-card__visual">
-                  <img src={item.image} alt={item.title} loading="lazy" />
+          <div
+            className="project-detail"
+            role="tabpanel"
+            id={`project-panel-${activeProjectIndex}`}
+            aria-labelledby={`project-tab-${activeProjectIndex}`}
+          >
+            <div className="project-detail__header">
+              <p className="project-detail__eyebrow">{activeProject.category}</p>
+              <h3>{activeProject.title}</h3>
+              <p className="project-detail__desc">{activeProject.description}</p>
+            </div>
+            <div className="project-detail__grid">
+              <div className="project-detail__block">
+                <h4>Technologies</h4>
+                <div className="project-detail__tags">
+                  {activeProject.technologies.map((tech) => (
+                    <span key={tech}>{tech}</span>
+                  ))}
                 </div>
-                <div className="work-card__body">
-                  <p className="work-card__category">{item.category}</p>
-                  <h3>{item.title}</h3>
-                  <p>{item.summary}</p>
-                  <a href="#contact" onClick={handleSectionNavigation}>View case study</a>
-                </div>
-              </article>
-            ))}
+              </div>
+              <div className="project-detail__block">
+                <h4>Problems solved</h4>
+                <ul className="project-detail__list">
+                  {activeProject.problems.map((problem) => (
+                    <li key={problem}>{problem}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </section>

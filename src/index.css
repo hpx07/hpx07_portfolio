@@ -1,13 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
-  --bg: #070b16;
-  --bg-soft: #0d1328;
-  --ink: #f4f7ff;
-  --muted: #9aa7c9;
-  --muted-soft: #b8c3e0;
-  --line: rgba(255, 255, 255, 0.15);
-  --line-strong: rgba(255, 255, 255, 0.3);
-  --sky: #7ce8ff;
-  --orange: #ff8e5b;
+  --bg: #010208;
+  --bg-soft: #050814;
+  --ink: #f5f7ff;
+  --muted: #8c97b0;
+  --muted-soft: #aab4cd;
+  --line: rgba(255, 255, 255, 0.12);
+  --line-strong: rgba(255, 255, 255, 0.24);
+  --sky: #8aa3ff;
+  --orange: #4aa7ff;
   --font-display: 'Antonio', 'Impact', sans-serif;
   --font-body: 'Space Grotesk', 'Trebuchet MS', sans-serif;
 
@@ -36,9 +40,9 @@ body {
   min-height: 100svh;
   color: var(--ink);
   background:
-    radial-gradient(circle at 15% 0%, #111c44 0%, transparent 50%),
-    radial-gradient(circle at 86% 26%, #2f1a37 0%, transparent 45%),
-    linear-gradient(180deg, var(--bg-soft) 0%, var(--bg) 40%, #05070f 100%);
+    radial-gradient(circle at 18% 6%, rgba(24, 46, 84, 0.55) 0%, transparent 56%),
+    radial-gradient(circle at 82% 22%, rgba(10, 16, 32, 0.9) 0%, transparent 52%),
+    linear-gradient(180deg, #02040b 0%, var(--bg) 52%, #010208 100%);
 }
 
 body::before {
