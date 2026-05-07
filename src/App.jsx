@@ -4,6 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from '@studio-freight/lenis'
 import SplitType from 'split-type'
 import FloatingLines from '@/components/FloatingLines/FloatingLines'
+import SplashCursor from '@/components/SplashCursor'
 import './App.css'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -90,6 +91,7 @@ const partnerNames = [
 const backgroundOptions = [
   { value: 'none', label: 'None (Classic)' },
   { value: 'floating-lines', label: 'Floating Lines' },
+  { value: 'splash-cursor', label: 'Splash Cursor' },
 ]
 
 const expertisePanels = [
@@ -666,6 +668,31 @@ function App() {
               mouseDamping={0.05}
               parallax
               parallaxStrength={0.2}
+            />
+          </div>
+        </div>
+      )}
+
+      {backgroundChoice === 'splash-cursor' && (
+        <div className="splash-cursor-bg" aria-hidden="true">
+          <div
+            className="splash-cursor-bg__inner"
+            style={{
+              width: 'max(1080px, 120vmax)',
+              height: 'max(1080px, 120vmax)',
+              position: 'relative',
+            }}
+          >
+            <SplashCursor
+              SIM_RESOLUTION={128}
+              DYE_RESOLUTION={1536}
+              DENSITY_DISSIPATION={4}
+              VELOCITY_DISSIPATION={2}
+              PRESSURE={0.2}
+              CURL={3}
+              SPLAT_RADIUS={0.2}
+              SPLAT_FORCE={6000}
+              COLOR_UPDATE_SPEED={10}
             />
           </div>
         </div>
