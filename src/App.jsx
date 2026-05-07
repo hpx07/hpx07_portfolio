@@ -7,6 +7,7 @@ import FloatingLines from '@/components/FloatingLines/FloatingLines'
 import SplashCursor from '@/components/SplashCursor'
 import GhostCursor from '@/components/GhostCursor/GhostCursor'
 import Antigravity from '@/components/Antigravity'
+import Silk from '@/components/Silk'
 import './App.css'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -96,6 +97,7 @@ const backgroundOptions = [
   { value: 'splash-cursor', label: 'Splash Cursor' },
   { value: 'ghost-cursor', label: 'Ghost Cursor' },
   { value: 'antigravity', label: 'Antigravity' },
+  { value: 'silk', label: 'Silk' },
 ]
 
 const expertisePanels = [
@@ -758,6 +760,27 @@ function App() {
         </div>
       )}
 
+      {backgroundChoice === 'silk' && (
+        <div className="silk-bg" aria-hidden="true">
+          <div
+            className="silk-bg__inner"
+            style={{
+              width: 'max(1080px, 120vmax)',
+              height: 'max(1080px, 120vmax)',
+              position: 'relative',
+            }}
+          >
+            <Silk
+              speed={5}
+              scale={1.5}
+              color="#3f1d76"
+              noiseIntensity={1.1}
+              rotation={0}
+            />
+          </div>
+        </div>
+      )}
+
       <div className="preloader" aria-hidden={experienceStarted}>
         <div className="preloader__panel preloader__panel--intro">
           <div className="preloader__header">
@@ -886,7 +909,7 @@ function App() {
         </div>
         <ul className="skills-row">
           {['Full-stack', 'React', 'Node.js', 'Cloud', 'Mobile UX', 'Photography'].map((skill) => (
-            <li className="skill-pill" key={skill}>
+            <li className="skill-pill" key={skill} style={{ background: '#140e22', color: '#ffffff' }}>
               {skill}
             </li>
           ))}
