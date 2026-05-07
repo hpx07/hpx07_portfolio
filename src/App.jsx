@@ -6,6 +6,7 @@ import SplitType from 'split-type'
 import FloatingLines from '@/components/FloatingLines/FloatingLines'
 import SplashCursor from '@/components/SplashCursor'
 import GhostCursor from '@/components/GhostCursor/GhostCursor'
+import Antigravity from '@/components/Antigravity'
 import './App.css'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -94,6 +95,7 @@ const backgroundOptions = [
   { value: 'floating-lines', label: 'Floating Lines' },
   { value: 'splash-cursor', label: 'Splash Cursor' },
   { value: 'ghost-cursor', label: 'Ghost Cursor' },
+  { value: 'antigravity', label: 'Antigravity' },
 ]
 
 const expertisePanels = [
@@ -720,6 +722,37 @@ function App() {
               color="#B497CF"
               edgeIntensity={0.7}
               zIndex={-3}
+            />
+          </div>
+        </div>
+      )}
+
+      {backgroundChoice === 'antigravity' && (
+        <div className="antigravity-bg" aria-hidden="true">
+          <div
+            className="antigravity-bg__inner"
+            style={{
+              width: 'max(1080px, 120vmax)',
+              height: 'max(1080px, 120vmax)',
+              position: 'relative',
+            }}
+          >
+            <Antigravity
+              count={540}
+              magnetRadius={16}
+              ringRadius={3}
+              waveSpeed={0.4}
+              waveAmplitude={0.8}
+              particleSize={0.4}
+              lerpSpeed={0.1}
+              color="#2799ff"
+              particleVariance={2.6}
+              rotationSpeed={0}
+              depthFactor={2}
+              pulseSpeed={3}
+              particleShape="tetrahedron"
+              fieldStrength={10}
+              useWindowPointer
             />
           </div>
         </div>
