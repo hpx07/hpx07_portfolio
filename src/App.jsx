@@ -87,6 +87,11 @@ const partnerNames = [
   'Copilot',
 ]
 
+const backgroundOptions = [
+  { value: 'none', label: 'None (Classic)' },
+  { value: 'floating-lines', label: 'Floating Lines' },
+]
+
 const expertisePanels = [
   {
     number: '01',
@@ -146,6 +151,8 @@ function App() {
   const expertiseStackRef = useRef(null)
   const [isLowEnd, setIsLowEnd] = useState(false)
   const [activeProjectIndex, setActiveProjectIndex] = useState(0)
+  const [backgroundChoice, setBackgroundChoice] = useState('none')
+  const [showSettings, setShowSettings] = useState(false)
   const activeProject = featuredProjects[activeProjectIndex] ?? featuredProjects[0]
 
   const handleSectionNavigation = (event) => {
@@ -412,6 +419,32 @@ function App() {
   }, [])
 
   useEffect(() => {
+    if (!experienceStarted) {
+      return
+    }
+
+    document.body.classList.toggle('is-locked', showSettings)
+    return () => {
+      document.body.classList.remove('is-locked')
+    }
+  }, [showSettings, experienceStarted])
+
+  useEffect(() => {
+    if (!showSettings) {
+      return
+    }
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setShowSettings(false)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [showSettings])
+
+  useEffect(() => {
     if (experienceStarted) {
       return
     }
@@ -614,27 +647,29 @@ function App() {
     <main className="page-shell" ref={appRef}>
       <div className="cursor-soft-light" ref={cursorLightRef} aria-hidden="true"></div>
 
-      <div className="floating-lines-bg" aria-hidden="true">
-        <div
-          className="floating-lines-bg__inner"
-          style={{
-            width: 'max(1080px, 120vmax)',
-            height: 'max(1080px, 120vmax)',
-            position: 'relative',
-          }}
-        >
-          <FloatingLines
-            linesGradient={['#E945F5', '#2F4BC0', '#E945F5']}
-            animationSpeed={1.7}
-            interactive
-            bendRadius={5}
-            bendStrength={-0.5}
-            mouseDamping={0.05}
-            parallax
-            parallaxStrength={0.2}
-          />
+      {backgroundChoice === 'floating-lines' && (
+        <div className="floating-lines-bg" aria-hidden="true">
+          <div
+            className="floating-lines-bg__inner"
+            style={{
+              width: 'max(1080px, 120vmax)',
+              height: 'max(1080px, 120vmax)',
+              position: 'relative',
+            }}
+          >
+            <FloatingLines
+              linesGradient={['#E945F5', '#2F4BC0', '#E945F5']}
+              animationSpeed={1.7}
+              interactive
+              bendRadius={5}
+              bendStrength={-0.5}
+              mouseDamping={0.05}
+              parallax
+              parallaxStrength={0.2}
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="preloader" aria-hidden={experienceStarted}>
         <div className="preloader__panel preloader__panel--intro">
@@ -693,11 +728,56 @@ function App() {
           <a href="#services" onClick={handleSectionNavigation}>Expertise</a>
           <a href="#contact" onClick={handleSectionNavigation}>Contact</a>
         </nav>
-        <a href="mailto:yournamepleaseplease@gmail.com" className="status-pill">
-          <span className="status-pill__dot"></span>
-          AVAILABLE FOR NEW BUILDS
-        </a>
+        <div className="top-nav__actions">
+          <button
+            className="settings-btn"
+            type="button"
+            onClick={() => setShowSettings(true)}
+            aria-haspopup="dialog"
+            aria-expanded={showSettings}
+          >
+            Settings
+          </button>
+          <a href="mailto:yournamepleaseplease@gmail.com" className="status-pill">
+            <span className="status-pill__dot"></span>
+            AVAILABLE FOR NEW BUILDS
+          </a>
+        </div>
       </header>
+
+      {showSettings && (
+        <div className="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+          <div className="settings-modal__backdrop" onClick={() => setShowSettings(false)}></div>
+          <div className="settings-modal__panel">
+            <div className="settings-modal__header">
+              <h2 id="settings-title">Settings</h2>
+              <button
+                type="button"
+                className="settings-modal__close"
+                onClick={() => setShowSettings(false)}
+              >
+                Close
+              </button>
+            </div>
+            <div className="settings-modal__body">
+              <label className="settings-field">
+                <span>Background</span>
+                <select
+                  value={backgroundChoice}
+                  onChange={(event) => setBackgroundChoice(event.target.value)}
+                >
+                  {backgroundOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <p className="settings-modal__hint">More backgrounds coming soon.</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <section className="section hero" id="home">
         <p className="hero-kicker">Full-stack developer, tech explorer, visual storyteller</p>
