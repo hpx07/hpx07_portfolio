@@ -5,6 +5,7 @@ import Lenis from '@studio-freight/lenis'
 import SplitType from 'split-type'
 import FloatingLines from '@/components/FloatingLines/FloatingLines'
 import SplashCursor from '@/components/SplashCursor'
+import GhostCursor from '@/components/GhostCursor/GhostCursor'
 import './App.css'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -92,6 +93,7 @@ const backgroundOptions = [
   { value: 'none', label: 'None (Classic)' },
   { value: 'floating-lines', label: 'Floating Lines' },
   { value: 'splash-cursor', label: 'Splash Cursor' },
+  { value: 'ghost-cursor', label: 'Ghost Cursor' },
 ]
 
 const expertisePanels = [
@@ -693,6 +695,31 @@ function App() {
               SPLAT_RADIUS={0.2}
               SPLAT_FORCE={6000}
               COLOR_UPDATE_SPEED={10}
+            />
+          </div>
+        </div>
+      )}
+
+      {backgroundChoice === 'ghost-cursor' && (
+        <div className="ghost-cursor-bg" aria-hidden="true">
+          <div
+            className="ghost-cursor-bg__inner"
+            style={{
+              width: 'max(1080px, 120vmax)',
+              height: 'max(1080px, 120vmax)',
+              position: 'relative',
+            }}
+          >
+            <GhostCursor
+              trailLength={50}
+              inertia={0.2}
+              grainIntensity={0.05}
+              bloomStrength={0.05}
+              bloomRadius={0.2}
+              brightness={0.5}
+              color="#B497CF"
+              edgeIntensity={0.7}
+              zIndex={-3}
             />
           </div>
         </div>

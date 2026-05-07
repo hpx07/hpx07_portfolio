@@ -35,6 +35,21 @@
   height: 100%;
 }
 
+.ghost-cursor-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  display: grid;
+  place-items: center;
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.ghost-cursor-bg__inner {
+  width: 100%;
+  height: 100%;
+}
+
 .page-shell>* {
   transition:
     opacity 0.72s cubic-bezier(0.22, 1, 0.36, 1),
