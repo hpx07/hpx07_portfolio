@@ -148,6 +148,8 @@ function getIsLowEnd() {
 
 function App() {
   const [experienceStarted, setExperienceStarted] = useState(false)
+  const [introProgress, setIntroProgress] = useState(0)
+  const [introPhase, setIntroPhase] = useState('loading')
   const appRef = useRef(null)
   const cursorLightRef = useRef(null)
   const magneticButtonRef = useRef(null)
@@ -162,6 +164,8 @@ function App() {
   const [backgroundChoice, setBackgroundChoice] = useState('none')
   const [showSettings, setShowSettings] = useState(false)
   const activeProject = featuredProjects[activeProjectIndex] ?? featuredProjects[0]
+  const introIsRevealed = introPhase === 'reveal'
+  const preloaderClassName = `preloader ${introIsRevealed ? 'preloader--reveal' : 'preloader--loading'}`
 
   const handleSectionNavigation = (event) => {
     const href = event.currentTarget.getAttribute('href')
@@ -457,14 +461,37 @@ function App() {
       return
     }
 
-    const handleKeyDown = (event) => {
-      if (event.key === 'Enter') {
-        setExperienceStarted(true)
+    let rafId = 0
+    let revealTimeout = 0
+    const durationMs = 1000
+    const start = performance.now()
+
+    setIntroPhase('loading')
+    setIntroProgress(0)
+
+    const tick = (now) => {
+      const elapsed = now - start
+      const progress = Math.min((elapsed / durationMs) * 100, 100)
+      setIntroProgress(progress)
+
+      if (progress < 100) {
+        rafId = requestAnimationFrame(tick)
+      } else {
+        setIntroPhase('reveal')
+        revealTimeout = window.setTimeout(() => {
+          setExperienceStarted(true)
+        }, 3000)
       }
     }
 
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    rafId = requestAnimationFrame(tick)
+
+    return () => {
+      cancelAnimationFrame(rafId)
+      if (revealTimeout) {
+        window.clearTimeout(revealTimeout)
+      }
+    }
   }, [experienceStarted])
 
   // Low-end detection + expertise will-change management
@@ -502,7 +529,7 @@ function App() {
     if (!experienceStarted) {
       document.body.classList.add('is-locked')
       gsap.set('.preloader', { autoAlpha: 1, pointerEvents: 'auto' })
-      gsap.set('.preloader__panel', { yPercent: 0 })
+      gsap.set('.preloader__panel', { clearProps: 'transform' })
       gsap.set('.smoke-overlay', { opacity: 0 })
       introTimelineRef.current?.pause(0)
       // Keep Lenis stopped while preloader is active
@@ -565,12 +592,12 @@ function App() {
     // ── PHASE 1 — DISSOLVE CARD (0 → 0.4s) ──
     // Fade out everything in the preloader (including the preloader h2 — hero title is now visible behind it)
     tl.to(
-      ['.preloader__header', '.preloader__note', '.preloader__stats', '.preloader__cta'],
-      { opacity: 0, duration: 0.3, ease: 'power2.out' },
+      ['.preloader__loading', '.preloader__panel > :not(h2)'],
+      { opacity: 0, duration: 0.85, ease: 'power2.out' },
       0,
     )
     // Fade out preloader title (hero title is already in its place)
-    tl.to(preTitle, { opacity: 0, duration: 0.25, ease: 'power2.out' }, 0.15)
+    tl.to(preTitle, { opacity: 0, duration: 0.6, ease: 'power2.out' }, 0.15)
     // Dissolve card chrome
     tl.to(
       '.preloader__panel',
@@ -578,7 +605,7 @@ function App() {
         borderColor: 'rgba(255,255,255,0)',
         background: 'rgba(0,0,0,0)',
         boxShadow: '0 0 0 rgba(0,0,0,0)',
-        duration: 0.35,
+        duration: 0.6,
         ease: 'power2.out',
       },
       0,
@@ -590,7 +617,7 @@ function App() {
     // Fade preloader backdrop
     tl.to(
       '.preloader',
-      { background: 'rgba(3, 6, 16, 0)', backdropFilter: 'blur(0px)', duration: 0.45, ease: 'power2.out' },
+      { background: 'rgba(3, 6, 16, 0)', backdropFilter: 'blur(0px)', duration: 1.4, ease: 'power2.out' },
       0.05,
     )
 
@@ -781,23 +808,31 @@ function App() {
         </div>
       )}
 
-      <div className="preloader" aria-hidden={experienceStarted}>
-        <div className="preloader__panel preloader__panel--intro">
+      <div className={preloaderClassName} aria-hidden={experienceStarted}>
+        <div className="preloader__loading" aria-hidden={introIsRevealed}>
+          <div
+            className="preloader__loading-track"
+            role="progressbar"
+            aria-valuenow={Math.round(introProgress)}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="Loading intro"
+          >
+            <span
+              className="preloader__loading-bar"
+              style={{ transform: `scaleX(${introProgress / 100})` }}
+            ></span>
+          </div>
+          <p className="preloader__loading-label">Loading experience</p>
+        </div>
+        <div className="preloader__panel preloader__panel--intro" aria-hidden={!introIsRevealed}>
           <div className="preloader__header">
             <span className="preloader__signal" aria-hidden="true"></span>
             <p className="preloader__tag">Independent Creator Profile</p>
           </div>
           <h2 ref={preloaderTitleRef}>HPX.DEV</h2>
-          <p className="preloader__note">
-            Full-stack developer, tech enthusiast, and photographer building seamless web and app
-            experiences with an eye for detail.
-          </p>
-          <div className="preloader__cta">
-            <button className="btn btn--primary" onClick={() => setExperienceStarted(true)}>
-              Enter portfolio
-            </button>
-          </div>
-          <div className="preloader__stats" aria-hidden="true">
+          <div className="preloader__divider" aria-hidden="true"></div>
+          <div className="preloader__stats preloader__stats--intro" aria-hidden="true">
             <div>
               <span>Focus</span>
               <strong>Full-stack</strong>
