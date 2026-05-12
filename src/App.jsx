@@ -14,63 +14,63 @@ gsap.registerPlugin(ScrollTrigger)
 
 const featuredProjects = [
   {
-    title: 'LensCraft Portfolio',
-    category: 'Photography Platform',
+    title: 'Diet-N-Health Tracker',
+    category: 'Mobile Application',
     description:
-      'A full-stack photography portfolio with dynamic galleries, EXIF filters, and edge-optimized delivery built for fast loads.',
-    technologies: ['React', 'Vite', 'Node.js', 'Cloudinary', 'PostgreSQL'],
+      'A comprehensive mobile health and nutrition tracking application with diet logging, health monitoring, and analytics built for offline-first mobile experiences.',
+    technologies: ['React','React Router', 'Capacitor', 'Recharts','LocalStorage','Supabase'],
     problems: [
-      'Large image libraries felt slow on mobile networks',
-      'Editors needed filters by camera, lens, and location metadata',
-      'Uploads had to be safe without blocking the editing flow',
+      'Offline-first mobile app with native Android experience',
+      'Comprehensive nutrition tracking with dietary filters',
+      'Real-time health data visualization and analytics',
     ],
   },
   {
-    title: 'StackPulse Console',
-    category: 'SaaS Dashboard',
+    title: 'XP-Player',
+    category: 'Mobile Application',
     description:
-      'A real-time analytics workspace for product, infrastructure, and growth metrics with composable dashboards.',
-    technologies: ['React', 'TypeScript', 'Node.js', 'WebSockets', 'Redis'],
+      'A modern, feature-rich Android music player with YouTube integration, background playback, playlist management, and lock screen controls.',
+    technologies: ['React', 'Vite', 'Capacitor.js', 'Custom Proxy Server', 'Invidious API', 'Youtube API'],
     problems: [
-      'Streaming telemetry had to stay reliable under load',
-      'High-density data needed to remain scannable and calm',
-      'Access control needed to scale across teams and roles',
+      'Can play any YouTube video as audio with background playback',
+      'Multiple player theme and accent color options, basically a personal APP',
+      'Multiple playback modes including shuffle, repeat, and smart queue generation',
     ],
   },
   {
-    title: 'Nomad Notes',
-    category: 'Cross-platform PWA',
+    title: 'Multiplayer Games',
+    category: 'Game Development',
     description:
-      'An offline-first writing app with fast search, synced drafts, and a distraction-free reading mode.',
-    technologies: ['React', 'Service Workers', 'IndexedDB', 'Firebase', 'Tailwind'],
+      'A collection of real-time multiplayer games including Tic-Tac-Toe, Bingo, and Dots and Boxes, playable across network with live gameplay synchronization. Hosted on own pi server so it can be down right now.',
+    technologies: ['HTML', 'JavaScript', 'Batch Script', 'Network Sockets', 'Real-time Sync'],
     problems: [
-      'Notes had to be available without a network connection',
-      'Search needed to feel instant across thousands of entries',
-      'Sync conflicts had to resolve without data loss',
+      'Real-time game state synchronization across network players',
+      'Multiple game modes in single platform',
+      'Low-latency move validation and turn management for seamless gameplay',
     ],
   },
   {
-    title: 'Pixel Drift Stories',
-    category: 'Visual Storytelling',
+    title: 'LX Encrypted Chat',
+    category: 'Web Application',
     description:
-      'A cinematic storytelling site mixing motion direction, typography, and photography to deliver immersive narratives.',
-    technologies: ['Next.js', 'GSAP', 'Three.js', 'Contentful', 'Vercel'],
+      'Secure, encrypted messaging platform with friend request system, real-time status, image sharing, and end-to-end encryption for private communications. Hosted on own pi server so it can be down right now.',
+    technologies: ['Node.js', 'Express', 'Socket.io', 'MariaDB', 'Crypto-JS', 'bcryptjs'],
     problems: [
-      'Animation needed to feel rich without blocking scroll',
-      'Large media had to stream quickly on slower devices',
-      'Editors needed a simple workflow for new stories',
+      'End-to-end AES encryption for secure messaging',
+      'Friend request system to control privacy and access',
+      'Real-time chat with image sharing and persistent storage',
     ],
   },
   {
-    title: 'FlowOps Control Room',
-    category: 'Developer Platform',
+    title: 'SERP',
+    category: 'ERP System',
     description:
-      'A scalable operations hub with workflow automation, observability tooling, and role-based controls.',
-    technologies: ['React', 'Node.js', 'PostgreSQL', 'Docker', 'Grafana'],
+      'A custom ERP system for a Major Healthcare Franchise Provider company, featuring Sales tracking, CRM and too many other features to streamline operations.', 
+    technologies: ['PHP', 'MySQL', 'Node.js', 'JavaScript','REST APIs', 'Bootstrap'], 
     problems: [
-      'Teams needed a single pane of glass for incidents',
-      'Automations had to be auditable and easy to edit',
-      'On-call handoffs required clear, live status',
+      'Integrated with Tally for real-time Voucher Report and Entry',
+      'Checks for Vacant area for Franchise appointments',
+      'High reliability requirements for critical business operations',
     ],
   },
 ]
@@ -99,6 +99,8 @@ const backgroundOptions = [
   { value: 'antigravity', label: 'Antigravity' },
   { value: 'silk', label: 'Silk' },
 ]
+
+const githubProjectsUrl = 'https://github.com/hpx07?tab=repositories'
 
 const expertisePanels = [
   {
@@ -159,13 +161,73 @@ function App() {
   const smokeRef = useRef(null)
   const lenisRef = useRef(null)
   const expertiseStackRef = useRef(null)
+  const flipTimeoutRef = useRef(0)
   const [isLowEnd, setIsLowEnd] = useState(false)
   const [activeProjectIndex, setActiveProjectIndex] = useState(0)
+  const [frontProjectIndex, setFrontProjectIndex] = useState(0)
+  const [backProjectIndex, setBackProjectIndex] = useState(0)
+  const [isProjectFlipped, setIsProjectFlipped] = useState(false)
+  const [isProjectFlipping, setIsProjectFlipping] = useState(false)
   const [backgroundChoice, setBackgroundChoice] = useState('none')
   const [showSettings, setShowSettings] = useState(false)
-  const activeProject = featuredProjects[activeProjectIndex] ?? featuredProjects[0]
+  const frontProject = featuredProjects[frontProjectIndex] ?? featuredProjects[0]
+  const backProject = featuredProjects[backProjectIndex] ?? featuredProjects[0]
+  const flipDurationMs = 700
   const introIsRevealed = introPhase === 'reveal'
   const preloaderClassName = `preloader ${introIsRevealed ? 'preloader--reveal' : 'preloader--loading'}`
+
+  const handleProjectSelect = (index) => {
+    if (index === activeProjectIndex || isProjectFlipping) {
+      return
+    }
+
+    setActiveProjectIndex(index)
+
+    if (isProjectFlipped) {
+      setFrontProjectIndex(index)
+    } else {
+      setBackProjectIndex(index)
+    }
+
+    setIsProjectFlipping(true)
+    setIsProjectFlipped((prev) => !prev)
+
+    if (flipTimeoutRef.current) {
+      window.clearTimeout(flipTimeoutRef.current)
+    }
+
+    flipTimeoutRef.current = window.setTimeout(() => {
+      setIsProjectFlipping(false)
+    }, flipDurationMs)
+  }
+
+  const renderProjectDetail = (project) => (
+    <>
+      <div className="project-detail__header">
+        <p className="project-detail__eyebrow">{project.category}</p>
+        <h3>{project.title}</h3>
+        <p className="project-detail__desc">{project.description}</p>
+      </div>
+      <div className="project-detail__grid">
+        <div className="project-detail__block">
+          <h4>Technologies</h4>
+          <div className="project-detail__tags">
+            {project.technologies.map((tech) => (
+              <span key={tech}>{tech}</span>
+            ))}
+          </div>
+        </div>
+        <div className="project-detail__block">
+          <h4>Problems solved</h4>
+          <ul className="project-detail__list">
+            {project.problems.map((problem) => (
+              <li key={problem}>{problem}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </>
+  )
 
   const handleSectionNavigation = (event) => {
     const href = event.currentTarget.getAttribute('href')
@@ -381,6 +443,9 @@ function App() {
       magneticButton?.removeEventListener('mousemove', handleMove)
       magneticButton?.removeEventListener('mouseleave', handleLeave)
       cancelAnimationFrame(rafId)
+      if (flipTimeoutRef.current) {
+        window.clearTimeout(flipTimeoutRef.current)
+      }
       lenisRef.current = null
       lenis.destroy()
       splitRef.current?.revert()
@@ -827,7 +892,6 @@ function App() {
         </div>
         <div className="preloader__panel preloader__panel--intro" aria-hidden={!introIsRevealed}>
           <div className="preloader__header">
-            <span className="preloader__signal" aria-hidden="true"></span>
             <p className="preloader__tag">Independent Creator Profile</p>
           </div>
           <h2 ref={preloaderTitleRef}>HPX.DEV</h2>
@@ -968,7 +1032,6 @@ function App() {
 
         <div className="section featured-projects">
           <div className="project-nav">
-            <p className="project-nav__label">Selected work</p>
             <ul className="project-nav__list" role="tablist" aria-label="Featured projects">
               {featuredProjects.map((project, index) => {
                 const isActive = index === activeProjectIndex
@@ -977,7 +1040,7 @@ function App() {
                     <button
                       type="button"
                       className={`project-nav__item ${isActive ? 'is-active' : ''}`}
-                      onClick={() => setActiveProjectIndex(index)}
+                      onClick={() => handleProjectSelect(index)}
                       role="tab"
                       id={`project-tab-${index}`}
                       aria-selected={isActive}
@@ -993,35 +1056,40 @@ function App() {
                 )
               })}
             </ul>
+            <a
+              className="project-nav__item project-nav__item--link"
+              href={githubProjectsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="View more projects on GitHub"
+            >
+              <span className="project-nav__dot" aria-hidden="true"></span>
+              <span className="project-nav__copy">
+                <span className="project-nav__title">More projects</span>
+                <span className="project-nav__meta">View on GitHub</span>
+              </span>
+              <span className="project-nav__cta" aria-hidden="true">→</span>
+            </a>
           </div>
 
           <div
-            className="project-detail"
+            className={`project-detail ${isProjectFlipped ? 'project-detail--flipped' : ''} ${isProjectFlipping ? 'project-detail--flipping' : ''}`}
             role="tabpanel"
             id={`project-panel-${activeProjectIndex}`}
             aria-labelledby={`project-tab-${activeProjectIndex}`}
           >
-            <div className="project-detail__header">
-              <p className="project-detail__eyebrow">{activeProject.category}</p>
-              <h3>{activeProject.title}</h3>
-              <p className="project-detail__desc">{activeProject.description}</p>
-            </div>
-            <div className="project-detail__grid">
-              <div className="project-detail__block">
-                <h4>Technologies</h4>
-                <div className="project-detail__tags">
-                  {activeProject.technologies.map((tech) => (
-                    <span key={tech}>{tech}</span>
-                  ))}
-                </div>
+            <div className="project-detail__flip">
+              <div
+                className="project-detail__face project-detail__face--front"
+                aria-hidden={isProjectFlipped}
+              >
+                {renderProjectDetail(frontProject)}
               </div>
-              <div className="project-detail__block">
-                <h4>Problems solved</h4>
-                <ul className="project-detail__list">
-                  {activeProject.problems.map((problem) => (
-                    <li key={problem}>{problem}</li>
-                  ))}
-                </ul>
+              <div
+                className="project-detail__face project-detail__face--back"
+                aria-hidden={!isProjectFlipped}
+              >
+                {renderProjectDetail(backProject)}
               </div>
             </div>
           </div>
