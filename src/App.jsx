@@ -92,7 +92,7 @@ const partnerNames = [
 ]
 
 const backgroundOptions = [
-  { value: 'none', label: 'None (Classic)' },
+  { value: 'none', label: 'Classic' },
   { value: 'floating-lines', label: 'Floating Lines' },
   { value: 'splash-cursor', label: 'Splash Cursor' },
   { value: 'ghost-cursor', label: 'Ghost Cursor' },
