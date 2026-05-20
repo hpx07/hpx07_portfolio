@@ -16,7 +16,6 @@
   --font-body: 'Space Grotesk', 'Trebuchet MS', sans-serif;
 
   font-family: var(--font-body);
-  font-size: 18px;
   line-height: 1.55;
   color: var(--ink);
   background: var(--bg);
