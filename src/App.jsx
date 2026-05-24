@@ -90,6 +90,7 @@ const featuredProjects = [
       'Comprehensive nutrition tracking with dietary filters',
       'Real-time health data visualization and analytics',
     ],
+    link:'https://diet-n-health-tracker.vercel.app/',
   },
   {
     title: 'XP-Player',
@@ -103,6 +104,7 @@ const featuredProjects = [
       'Multiple player theme and accent color options, basically a personal APP',
       'Multiple playback modes including shuffle, repeat, and smart queue generation',
     ],
+    link:'https://xp-player.vercel.app/',
   },
   {
     title: 'Multiplayer Games',
@@ -116,6 +118,7 @@ const featuredProjects = [
       'Multiple game modes in single platform',
       'Low-latency move validation and turn management for seamless gameplay',
     ],
+    link:'#',
   },
   {
     title: 'LX Encrypted Chat',
@@ -129,6 +132,7 @@ const featuredProjects = [
       'Friend request system to control privacy and access',
       'Real-time chat with image sharing and persistent storage',
     ],
+    link:'#',
   },
   {
     title: 'SERP',
@@ -142,6 +146,7 @@ const featuredProjects = [
       'Checks for Vacant area for Franchise appointments',
       'High reliability requirements for critical business operations',
     ],
+    link:'#',
   },
 ]
 
@@ -233,8 +238,9 @@ const projectCards = featuredProjects.map((project) => ({
   title: project.title,
   description: project.category,
   src: project.image,
-  ctaText: 'View repo',
-  ctaLink: githubProjectsUrl,
+  ctaText: (!project.link || project.link === '#') ? 'No Access' : 'View Project',
+  ctaLink: project.link,
+  hasAccess: project.link && project.link !== '#',
   content: () => (
     <div className="flex flex-col gap-4">
       <p className="text-neutral-600 dark:text-neutral-300 text-sm leading-relaxed">
@@ -1131,7 +1137,7 @@ function App() {
           every interface, balancing engineering precision with visual emotion.
         </p>
         <div className="hero-actions">
-          <button className="btn btn--primary" ref={magneticButtonRef}>
+          <button className="btn btn--primary" ref={magneticButtonRef}  href="#work" onClick={handleSectionNavigation}>
             View projects
           </button>
           <a className="btn btn--ghost" href="#work" onClick={handleSectionNavigation}>

@@ -88,10 +88,19 @@ export function ExpandableProjectCards({ cards }) {
 
                   <motion.a
                     layoutId={`button-${active.title}-${id}`}
-                    href={active.ctaLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="self-start px-4 py-3 text-sm rounded-full font-bold bg-green-500 text-white"
+                    href={active.hasAccess ? active.ctaLink : undefined}
+                    target={active.hasAccess ? "_blank" : undefined}
+                    rel={active.hasAccess ? "noopener noreferrer" : undefined}
+                    className={`self-start px-4 py-3 text-sm rounded-full font-bold ${
+                      active.hasAccess 
+                        ? 'bg-green-500 text-white cursor-pointer hover:bg-green-600' 
+                        : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                    }`}
+                    onClick={(e) => {
+                      if (!active.hasAccess) {
+                        e.preventDefault()
+                      }
+                    }}
                   >
                     {active.ctaText}
                   </motion.a>
@@ -155,7 +164,11 @@ export function ExpandableProjectCards({ cards }) {
             </div>
             <motion.span
               layoutId={`button-${card.title}-${id}`}
-              className="px-4 py-2 text-sm rounded-full font-bold bg-gray-100 hover:bg-green-500 hover:text-white text-black mt-4 md:mt-0"
+              className={`px-4 py-2 text-sm rounded-full font-bold mt-4 md:mt-0 ${
+                card.hasAccess
+                  ? 'bg-gray-100 hover:bg-green-500 hover:text-white text-black'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
             >
               {card.ctaText}
             </motion.span>
