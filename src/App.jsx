@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from '@studio-freight/lenis'
@@ -8,9 +8,74 @@ import SplashCursor from '@/components/SplashCursor'
 import GhostCursor from '@/components/GhostCursor/GhostCursor'
 import Antigravity from '@/components/Antigravity'
 import Silk from '@/components/Silk'
+import { ExpandableProjectCards } from '@/components/ExpandableProjectCards'
 import './App.css'
 
 gsap.registerPlugin(ScrollTrigger)
+
+const normalizeHex = (value) => {
+  if (!value) return '#000000'
+  const trimmed = String(value).replace('#', '').trim()
+  if (trimmed.length === 3) {
+    return `#${trimmed.split('').map((char) => char + char).join('')}`
+  }
+  if (trimmed.length === 6) {
+    return `#${trimmed}`
+  }
+  return '#000000'
+}
+
+const hexToRgb = (value) => {
+  const hex = normalizeHex(value).slice(1)
+  const r = Number.parseInt(hex.slice(0, 2), 16)
+  const g = Number.parseInt(hex.slice(2, 4), 16)
+  const b = Number.parseInt(hex.slice(4, 6), 16)
+  return { r, g, b }
+}
+
+const hexToNormalizedRgb = (value) => {
+  const { r, g, b } = hexToRgb(value)
+  return { r: r / 255, g: g / 255, b: b / 255 }
+}
+
+const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
+
+const getLuminance = ({ r, g, b }) => {
+  const toLinear = (channel) => {
+    const c = channel / 255
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
+  }
+  const rLinear = toLinear(r)
+  const gLinear = toLinear(g)
+  const bLinear = toLinear(b)
+  return 0.2126 * rLinear + 0.7152 * gLinear + 0.0722 * bLinear
+}
+
+const mixHex = (from, to, weight = 0.5) => {
+  const a = hexToRgb(from)
+  const b = hexToRgb(to)
+  const w = clamp(weight, 0, 1)
+  const mix = (start, end) => Math.round(start * (1 - w) + end * w)
+  const r = mix(a.r, b.r)
+  const g = mix(a.g, b.g)
+  const bValue = mix(a.b, b.b)
+  return `#${[r, g, bValue].map((channel) => channel.toString(16).padStart(2, '0')).join('')}`
+}
+
+const buildThemeTokens = (theme) => {
+  const base = normalizeHex(theme.base)
+  const accent = normalizeHex(theme.accent)
+  const baseLum = getLuminance(hexToRgb(base))
+  const isLightBase = baseLum > 0.58
+  const accentMixA = theme.accentMixA ?? (isLightBase ? 0.45 : 0.3)
+  const accentMixB = theme.accentMixB ?? (isLightBase ? 0.68 : 0.55)
+  const accent2 = normalizeHex(theme.accent2 ?? mixHex(accent, base, accentMixA))
+  const accent3 = normalizeHex(theme.accent3 ?? mixHex(accent, base, accentMixB))
+  const ink = normalizeHex(
+    theme.ink ?? (isLightBase ? accent : mixHex('#ffffff', accent, 0.12)),
+  )
+  return { base, accent, accent2, accent3, ink }
+}
 
 const featuredProjects = [
   {
@@ -18,6 +83,7 @@ const featuredProjects = [
     category: 'Mobile Application',
     description:
       'A comprehensive mobile health and nutrition tracking application with diet logging, health monitoring, and analytics built for offline-first mobile experiences.',
+    image: 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&w=900&q=80',
     technologies: ['React','React Router', 'Capacitor', 'Recharts','LocalStorage','Supabase'],
     problems: [
       'Offline-first mobile app with native Android experience',
@@ -30,6 +96,7 @@ const featuredProjects = [
     category: 'Mobile Application',
     description:
       'A modern, feature-rich Android music player with YouTube integration, background playback, playlist management, and lock screen controls.',
+    image: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=900&q=80',
     technologies: ['React', 'Vite', 'Capacitor.js', 'Custom Proxy Server', 'Invidious API', 'Youtube API'],
     problems: [
       'Can play any YouTube video as audio with background playback',
@@ -42,6 +109,7 @@ const featuredProjects = [
     category: 'Game Development',
     description:
       'A collection of real-time multiplayer games including Tic-Tac-Toe, Bingo, and Dots and Boxes, playable across network with live gameplay synchronization. Hosted on own pi server so it can be down right now.',
+    image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=900&q=80',
     technologies: ['HTML', 'JavaScript', 'Batch Script', 'Network Sockets', 'Real-time Sync'],
     problems: [
       'Real-time game state synchronization across network players',
@@ -54,6 +122,7 @@ const featuredProjects = [
     category: 'Web Application',
     description:
       'Secure, encrypted messaging platform with friend request system, real-time status, image sharing, and end-to-end encryption for private communications. Hosted on own pi server so it can be down right now.',
+    image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80',
     technologies: ['Node.js', 'Express', 'Socket.io', 'MariaDB', 'Crypto-JS', 'bcryptjs'],
     problems: [
       'End-to-end AES encryption for secure messaging',
@@ -66,6 +135,7 @@ const featuredProjects = [
     category: 'ERP System',
     description:
       'A custom ERP system for a Major Healthcare Franchise Provider company, featuring Sales tracking, CRM and too many other features to streamline operations.', 
+    image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=900&q=80',
     technologies: ['PHP', 'MySQL', 'Node.js', 'JavaScript','REST APIs', 'Bootstrap'], 
     problems: [
       'Integrated with Tally for real-time Voucher Report and Entry',
@@ -92,7 +162,7 @@ const partnerNames = [
 ]
 
 const backgroundOptions = [
-  { value: 'none', label: 'Classic' },
+  { value: 'none', label: 'None' },
   { value: 'floating-lines', label: 'Floating Lines' },
   { value: 'splash-cursor', label: 'Splash Cursor' },
   { value: 'ghost-cursor', label: 'Ghost Cursor' },
@@ -100,7 +170,100 @@ const backgroundOptions = [
   { value: 'silk', label: 'Silk' },
 ]
 
+const themeOptions = [
+  {
+    value: 'classic',
+    label: 'Classic',
+    base: '#010208',
+    accent: '#4aa7ff',
+    accent2: '#8aa3ff',
+    accent3: '#1f305e',
+    ink: '#f5f7ff',
+  },
+  {
+    value: 'night-kiwi',
+    label: 'Night Kiwi',
+    base: '#222222',
+    accent: '#89e900',
+    accent2: '#b7ff4b',
+    accent3: '#4a6500',
+    ink: '#f2ffe0',
+  },
+  {
+    value: 'ghost-persian',
+    label: 'Ghost Persian',
+    base: '#27187e',
+    accent: '#f7f7ff',
+    accent2: '#d7d5ff',
+    accent3: '#4a3bb6',
+    ink: '#f7f7ff',
+  },
+  {
+    value: 'imperial-night',
+    label: 'Imperial Night',
+    base: '#000f08',
+    accent: '#fb3640',
+    accent2: '#ff6670',
+    accent3: '#6a0c16',
+    ink: '#ffe8ea',
+  },
+  {
+    value: 'sand-cyprus',
+    label: 'Sand Cyprus',
+    base: '#f0ede5',
+    accent: '#004643',
+    accent2: '#2f7b75',
+    accent3: '#88b6ae',
+    ink: '#004643',
+  },
+  {
+    value: 'milk-plum',
+    label: 'Milk Plum',
+    base: '#fff3e6',
+    accent: '#381932',
+    accent2: '#6c3a57',
+    accent3: '#d8b6c6',
+    ink: '#381932',
+  },
+]
+
 const githubProjectsUrl = 'https://github.com/hpx07?tab=repositories'
+
+const projectCards = featuredProjects.map((project) => ({
+  title: project.title,
+  description: project.category,
+  src: project.image,
+  ctaText: 'View repo',
+  ctaLink: githubProjectsUrl,
+  content: () => (
+    <div className="flex flex-col gap-4">
+      <p className="text-neutral-600 dark:text-neutral-300 text-sm leading-relaxed">
+        {project.description}
+      </p>
+      <div className="flex flex-col gap-2">
+        <p className="text-xs uppercase tracking-[0.3em] text-neutral-500">Technologies</p>
+        <div className="flex flex-wrap gap-2">
+          {project.technologies.map((tech) => (
+            <span
+              key={tech}
+              className="px-3 py-1 rounded-full border border-neutral-200 dark:border-neutral-700 text-[0.65rem] uppercase tracking-[0.12em] text-neutral-600 dark:text-neutral-300"
+            >
+              {tech}
+            </span>
+          ))}
+        </div>
+      </div>
+      <div className="flex flex-col gap-2">
+        <p className="text-xs uppercase tracking-[0.3em] text-neutral-500">Problems solved</p>
+        <ul className="flex flex-col gap-2 text-neutral-600 dark:text-neutral-300 text-sm">
+          {project.problems.map((problem) => (
+            <li key={problem}>{problem}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  ),
+}))
 
 const expertisePanels = [
   {
@@ -110,8 +273,6 @@ const expertisePanels = [
     description:
       'From wireframes to polished prototypes, I craft digital experiences where every pixel has purpose — balancing aesthetics with usability to create interfaces users love.',
     skills: ['UI / UX Design', 'Design Systems', 'Motion & Interactions', 'Prototyping', 'Brand Identity'],
-    accent: '#7ce8ff',
-    bg: 'linear-gradient(165deg, #0f1b3d 0%, #0a1628 50%, #070b16 100%)',
     image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=600&fit=crop',
   },
   {
@@ -120,9 +281,7 @@ const expertisePanels = [
     headline: 'Code that scales and ships',
     description:
       'I build full-stack applications with clean architecture, type-safe code, and production-hardened infrastructure — engineered for performance under real-world pressure.',
-    skills: ['React / Next.js', 'Node.js / Express', 'TypeScript', 'Cloud & DevOps', 'API Design'],
-    accent: '#ff8e5b',
-    bg: 'linear-gradient(165deg, #1f1020 0%, #150d22 50%, #070b16 100%)',
+    skills: ['React / Next.js', 'Node.js / Express', 'TypeScript', 'Cloud & CI/DI', 'API Design'],
     image: 'https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=600&h=600&fit=crop',
   },
   {
@@ -132,8 +291,6 @@ const expertisePanels = [
     description:
       'I connect business goals to technical roadmaps. Every project starts with understanding the "why" — then mapping the fastest path from concept to shipped product.',
     skills: ['Product Strategy', 'Technical Architecture', 'Performance Optimization', 'Growth Engineering'],
-    accent: '#5dff9f',
-    bg: 'linear-gradient(165deg, #0a1f1a 0%, #0c1620 50%, #070b16 100%)',
     image: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=600&h=600&fit=crop',
   },
 
@@ -161,73 +318,15 @@ function App() {
   const smokeRef = useRef(null)
   const lenisRef = useRef(null)
   const expertiseStackRef = useRef(null)
-  const flipTimeoutRef = useRef(0)
+  const flipTimeoutRef = useRef(null)
   const [isLowEnd, setIsLowEnd] = useState(false)
-  const [activeProjectIndex, setActiveProjectIndex] = useState(0)
-  const [frontProjectIndex, setFrontProjectIndex] = useState(0)
-  const [backProjectIndex, setBackProjectIndex] = useState(0)
-  const [isProjectFlipped, setIsProjectFlipped] = useState(false)
-  const [isProjectFlipping, setIsProjectFlipping] = useState(false)
+  const [themeChoice, setThemeChoice] = useState('classic')
   const [backgroundChoice, setBackgroundChoice] = useState('none')
   const [showSettings, setShowSettings] = useState(false)
-  const frontProject = featuredProjects[frontProjectIndex] ?? featuredProjects[0]
-  const backProject = featuredProjects[backProjectIndex] ?? featuredProjects[0]
-  const flipDurationMs = 700
+  const activeTheme = themeOptions.find((theme) => theme.value === themeChoice) ?? themeOptions[0]
+  const themeTokens = useMemo(() => buildThemeTokens(activeTheme), [activeTheme])
   const introIsRevealed = introPhase === 'reveal'
   const preloaderClassName = `preloader ${introIsRevealed ? 'preloader--reveal' : 'preloader--loading'}`
-
-  const handleProjectSelect = (index) => {
-    if (index === activeProjectIndex || isProjectFlipping) {
-      return
-    }
-
-    setActiveProjectIndex(index)
-
-    if (isProjectFlipped) {
-      setFrontProjectIndex(index)
-    } else {
-      setBackProjectIndex(index)
-    }
-
-    setIsProjectFlipping(true)
-    setIsProjectFlipped((prev) => !prev)
-
-    if (flipTimeoutRef.current) {
-      window.clearTimeout(flipTimeoutRef.current)
-    }
-
-    flipTimeoutRef.current = window.setTimeout(() => {
-      setIsProjectFlipping(false)
-    }, flipDurationMs)
-  }
-
-  const renderProjectDetail = (project) => (
-    <>
-      <div className="project-detail__header">
-        <p className="project-detail__eyebrow">{project.category}</p>
-        <h3>{project.title}</h3>
-        <p className="project-detail__desc">{project.description}</p>
-      </div>
-      <div className="project-detail__grid">
-        <div className="project-detail__block">
-          <h4>Technologies</h4>
-          <div className="project-detail__tags">
-            {project.technologies.map((tech) => (
-              <span key={tech}>{tech}</span>
-            ))}
-          </div>
-        </div>
-        <div className="project-detail__block">
-          <h4>Problems solved</h4>
-          <ul className="project-detail__list">
-            {project.problems.map((problem) => (
-              <li key={problem}>{problem}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </>
-  )
 
   const handleSectionNavigation = (event) => {
     const href = event.currentTarget.getAttribute('href')
@@ -259,6 +358,23 @@ function App() {
       window.history.replaceState(null, '', href)
     }
   }
+
+  useEffect(() => {
+    const root = document.documentElement
+    root.dataset.theme = activeTheme.value
+    root.style.setProperty('--theme-base', themeTokens.base)
+    root.style.setProperty('--theme-ink', themeTokens.ink)
+    root.style.setProperty('--theme-accent', themeTokens.accent)
+    root.style.setProperty('--theme-accent-2', themeTokens.accent2)
+    root.style.setProperty('--theme-accent-3', themeTokens.accent3)
+  }, [
+    activeTheme.value,
+    themeTokens.base,
+    themeTokens.ink,
+    themeTokens.accent,
+    themeTokens.accent2,
+    themeTokens.accent3,
+  ])
 
   useEffect(() => {
     const lenis = new Lenis({
@@ -359,23 +475,23 @@ function App() {
           '-=0.5',
         )
         .from(
-          '.project-nav__item',
+          '.projects-card-item',
           {
             y: 50,
             opacity: 0,
-            stagger: 0.06,
+            stagger: 0.07,
             duration: 0.6,
           },
           '-=0.3',
         )
         .from(
-          '.project-detail',
+          '.projects-card-list',
           {
-            y: 50,
+            y: 30,
             opacity: 0,
-            duration: 0.7,
+            duration: 0.5,
           },
-          '-=0.45',
+          '-=0.35',
         )
 
       gsap.to('.marquee__inner', {
@@ -758,7 +874,7 @@ function App() {
             }}
           >
             <FloatingLines
-              linesGradient={['#E945F5', '#2F4BC0', '#E945F5']}
+              linesGradient={[themeTokens.accent3, themeTokens.accent2, themeTokens.accent3]}
               animationSpeed={1.7}
               interactive
               bendRadius={5}
@@ -791,6 +907,9 @@ function App() {
               SPLAT_RADIUS={0.2}
               SPLAT_FORCE={6000}
               COLOR_UPDATE_SPEED={10}
+              COLOR={themeTokens.accent}
+              RAINBOW_MODE={false}
+              BACK_COLOR={hexToNormalizedRgb(themeTokens.base)}
             />
           </div>
         </div>
@@ -813,7 +932,7 @@ function App() {
               bloomStrength={0.05}
               bloomRadius={0.2}
               brightness={0.5}
-              color="#B497CF"
+              color={themeTokens.accent2}
               edgeIntensity={0.7}
               zIndex={-3}
             />
@@ -839,7 +958,7 @@ function App() {
               waveAmplitude={0.8}
               particleSize={0.4}
               lerpSpeed={0.1}
-              color="#2799ff"
+              color={themeTokens.accent}
               particleVariance={2.6}
               rotationSpeed={0}
               depthFactor={2}
@@ -865,7 +984,7 @@ function App() {
             <Silk
               speed={5}
               scale={1.5}
-              color="#3f1d76"
+              color={themeTokens.accent3}
               noiseIntensity={1.1}
               rotation={0}
             />
@@ -970,6 +1089,19 @@ function App() {
             </div>
             <div className="settings-modal__body">
               <label className="settings-field">
+                <span>Theme</span>
+                <select
+                  value={themeChoice}
+                  onChange={(event) => setThemeChoice(event.target.value)}
+                >
+                  {themeOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="settings-field">
                 <span>Background</span>
                 <select
                   value={backgroundChoice}
@@ -1008,7 +1140,7 @@ function App() {
         </div>
         <ul className="skills-row">
           {['Full-stack', 'React', 'Node.js', 'Cloud', 'Mobile UX', 'Photography'].map((skill) => (
-            <li className="skill-pill" key={skill} style={{ background: '#140e22', color: '#ffffff' }}>
+            <li className="skill-pill" key={skill}>
               {skill}
             </li>
           ))}
@@ -1029,70 +1161,8 @@ function App() {
             design move as one.
           </p>
         </div>
-
-        <div className="section featured-projects">
-          <div className="project-nav">
-            <ul className="project-nav__list" role="tablist" aria-label="Featured projects">
-              {featuredProjects.map((project, index) => {
-                const isActive = index === activeProjectIndex
-                return (
-                  <li key={project.title}>
-                    <button
-                      type="button"
-                      className={`project-nav__item ${isActive ? 'is-active' : ''}`}
-                      onClick={() => handleProjectSelect(index)}
-                      role="tab"
-                      id={`project-tab-${index}`}
-                      aria-selected={isActive}
-                      aria-controls={`project-panel-${index}`}
-                    >
-                      <span className="project-nav__dot" aria-hidden="true"></span>
-                      <span className="project-nav__copy">
-                        <span className="project-nav__title">{project.title}</span>
-                        <span className="project-nav__meta">{project.category}</span>
-                      </span>
-                    </button>
-                  </li>
-                )
-              })}
-            </ul>
-            <a
-              className="project-nav__item project-nav__item--link"
-              href={githubProjectsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="View more projects on GitHub"
-            >
-              <span className="project-nav__dot" aria-hidden="true"></span>
-              <span className="project-nav__copy">
-                <span className="project-nav__title">More projects</span>
-                <span className="project-nav__meta">View on GitHub</span>
-              </span>
-              <span className="project-nav__cta" aria-hidden="true">→</span>
-            </a>
-          </div>
-
-          <div
-            className={`project-detail ${isProjectFlipped ? 'project-detail--flipped' : ''} ${isProjectFlipping ? 'project-detail--flipping' : ''}`}
-            role="tabpanel"
-            id={`project-panel-${activeProjectIndex}`}
-            aria-labelledby={`project-tab-${activeProjectIndex}`}
-          >
-            <div className="project-detail__flip">
-              <div
-                className="project-detail__face project-detail__face--front"
-                aria-hidden={isProjectFlipped}
-              >
-                {renderProjectDetail(frontProject)}
-              </div>
-              <div
-                className="project-detail__face project-detail__face--back"
-                aria-hidden={!isProjectFlipped}
-              >
-                {renderProjectDetail(backProject)}
-              </div>
-            </div>
-          </div>
+        <div className="section">
+          <ExpandableProjectCards cards={projectCards} />
         </div>
       </section>
 
@@ -1119,41 +1189,44 @@ function App() {
         </div>
 
         <div className="expertise-stack">
-          {expertisePanels.map((panel, i) => (
-            <div
-              className={`expertise-panel ${i === expertisePanels.length - 1 ? 'expertise-panel--last' : ''
-                }`}
-              key={panel.title}
-              style={{
-                '--panel-accent': panel.accent,
-                '--panel-bg': panel.bg,
-                zIndex: i + 1,
-              }}
-            >
-              <div className="expertise-panel__inner">
-                <div className="expertise-panel__left">
-                  <span className="expertise-panel__number">{panel.number}</span>
-                  <h3 className="expertise-panel__title">{panel.title}</h3>
-                  <p className="expertise-panel__headline">{panel.headline}</p>
-                  <p className="expertise-panel__desc">{panel.description}</p>
-                  <div className="expertise-panel__skills">
-                    {panel.skills.map((s) => (
-                      <span key={s}>{s}</span>
-                    ))}
+          {expertisePanels.map((panel, i) => {
+            const panelIndex = i + 1
+            return (
+              <div
+                className={`expertise-panel ${i === expertisePanels.length - 1 ? 'expertise-panel--last' : ''
+                  }`}
+                key={panel.title}
+                style={{
+                  '--panel-accent': `var(--panel-accent-${panelIndex})`,
+                  '--panel-bg': `var(--panel-bg-${panelIndex})`,
+                  zIndex: panelIndex,
+                }}
+              >
+                <div className="expertise-panel__inner">
+                  <div className="expertise-panel__left">
+                    <span className="expertise-panel__number">{panel.number}</span>
+                    <h3 className="expertise-panel__title">{panel.title}</h3>
+                    <p className="expertise-panel__headline">{panel.headline}</p>
+                    <p className="expertise-panel__desc">{panel.description}</p>
+                    <div className="expertise-panel__skills">
+                      {panel.skills.map((s) => (
+                        <span key={s}>{s}</span>
+                      ))}
+                    </div>
+                    <a href="#contact" className="expertise-panel__link" onClick={handleSectionNavigation}>
+                      Learn more <span aria-hidden="true">→</span>
+                    </a>
                   </div>
-                  <a href="#contact" className="expertise-panel__link" onClick={handleSectionNavigation}>
-                    Learn more <span aria-hidden="true">→</span>
-                  </a>
-                </div>
-                <div className="expertise-panel__right" aria-hidden="true">
-                  <div className="expertise-panel__visual">
-                    <img src={panel.image} alt={panel.title} loading="lazy" />
+                  <div className="expertise-panel__right" aria-hidden="true">
+                    <div className="expertise-panel__visual">
+                      <img src={panel.image} alt={panel.title} loading="lazy" />
+                    </div>
                   </div>
                 </div>
+                <span className="expertise-panel__big-word">{panel.title}</span>
               </div>
-              <span className="expertise-panel__big-word">{panel.title}</span>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </section>
 

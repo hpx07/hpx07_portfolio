@@ -3,15 +3,76 @@
 @tailwind utilities;
 
 :root {
-  --bg: #010208;
-  --bg-soft: #050814;
-  --ink: #f5f7ff;
-  --muted: #8c97b0;
-  --muted-soft: #aab4cd;
-  --line: rgba(255, 255, 255, 0.12);
-  --line-strong: rgba(255, 255, 255, 0.24);
-  --sky: #8aa3ff;
-  --orange: #4aa7ff;
+  --theme-base: #010208;
+  --theme-ink: #f5f7ff;
+  --theme-accent: #0a0175;
+  --theme-accent-2: #8aa3ff;
+  --theme-accent-3: #1f305e;
+
+  --bg: var(--theme-base);
+  --bg-soft: color-mix(in srgb, var(--theme-base) 90%, var(--theme-ink) 10%);
+  --ink: var(--theme-ink);
+  --muted: color-mix(in srgb, var(--theme-ink) 60%, var(--theme-base));
+  --muted-soft: color-mix(in srgb, var(--theme-ink) 74%, var(--theme-base));
+  --line: color-mix(in srgb, var(--theme-ink) 12%, transparent);
+  --line-strong: color-mix(in srgb, var(--theme-ink) 22%, transparent);
+
+  --accent: var(--theme-accent);
+  --accent-2: var(--theme-accent-2);
+  --accent-3: var(--theme-accent-3);
+  --accent-strong: color-mix(in srgb, var(--accent) 72%, var(--ink) 28%);
+  --accent-soft: color-mix(in srgb, var(--accent) 25%, transparent);
+  --accent-ghost: color-mix(in srgb, var(--accent) 14%, transparent);
+  --accent-glow: color-mix(in srgb, var(--accent) 45%, transparent);
+  --accent-2-soft: color-mix(in srgb, var(--accent-2) 22%, transparent);
+  --accent-2-glow: color-mix(in srgb, var(--accent-2) 38%, transparent);
+
+  --surface-1: color-mix(in srgb, var(--bg) 88%, var(--ink) 12%);
+  --surface-2: color-mix(in srgb, var(--bg) 80%, var(--ink) 20%);
+  --surface-3: color-mix(in srgb, var(--bg) 72%, var(--ink) 28%);
+  --surface-4: color-mix(in srgb, var(--bg) 62%, var(--ink) 38%);
+  --glass: color-mix(in srgb, var(--surface-2) 72%, transparent);
+  --glass-strong: color-mix(in srgb, var(--surface-3) 86%, transparent);
+
+  --shadow-strong: color-mix(in srgb, #000 70%, transparent);
+  --shadow-medium: color-mix(in srgb, #000 45%, transparent);
+  --shadow-soft: color-mix(in srgb, #000 30%, transparent);
+
+  --grid-dot: color-mix(in srgb, var(--ink) 12%, transparent);
+  --bg-glow-a: color-mix(in srgb, var(--accent-2) 1%, transparent);
+  --bg-glow-b: color-mix(in srgb, var(--accent-3) 3%, transparent);
+  --bg-shadow: color-mix(in srgb, var(--bg) 70%, #000 30%);
+
+  --card-gradient: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--surface-2) 68%, var(--accent-2) 32%),
+    color-mix(in srgb, var(--surface-2) 80%, var(--accent) 20%)
+  );
+
+  --panel-accent-1: var(--accent-2);
+  --panel-accent-2: var(--accent);
+  --panel-accent-3: var(--accent-3);
+  /* --panel-bg-1: linear-gradient(
+    165deg,
+    color-mix(in srgb, var(--bg) 70%, var(--accent-2) 30%) 0%,
+    color-mix(in srgb, var(--bg) 84%, var(--accent-2) 16%) 50%,
+    color-mix(in srgb, var(--bg) 92%, var(--accent-2) 8%) 100%
+  ); */
+  --panel-bg-2: linear-gradient(
+    165deg,
+    color-mix(in srgb, var(--bg) 70%, var(--accent) 30%) 0%,
+    color-mix(in srgb, var(--bg) 84%, var(--accent) 16%) 50%,
+    color-mix(in srgb, var(--bg) 92%, var(--accent) 8%) 100%
+  );
+  /* --panel-bg-3: linear-gradient(
+    165deg,
+    color-mix(in srgb, var(--bg) 70%, var(--accent-3) 30%) 0%,
+    color-mix(in srgb, var(--bg) 84%, var(--accent-3) 16%) 50%,
+    color-mix(in srgb, var(--bg) 92%, var(--accent-3) 8%) 100%
+  ); */
+
+  --sky: var(--accent-2);
+  --orange: var(--accent);
   --font-display: 'Antonio', 'Impact', sans-serif;
   --font-body: 'Space Grotesk', 'Trebuchet MS', sans-serif;
 
@@ -40,9 +101,9 @@ body {
   min-height: 100svh;
   color: var(--ink);
   background:
-    radial-gradient(circle at 18% 6%, rgba(24, 46, 84, 0.55) 0%, transparent 56%),
-    radial-gradient(circle at 82% 22%, rgba(10, 16, 32, 0.9) 0%, transparent 52%),
-    linear-gradient(180deg, #02040b 0%, var(--bg) 52%, #010208 100%);
+    radial-gradient(circle at 18% 6%, var(--bg-glow-a) 0%, transparent 56%),
+    radial-gradient(circle at 82% 22%, var(--bg-glow-b) 0%, transparent 52%),
+    linear-gradient(180deg, var(--bg-shadow) 0%, var(--bg) 52%, var(--bg-shadow) 100%);
 }
 
 body::before {
@@ -50,7 +111,7 @@ body::before {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.09) 0.7px, transparent 0.7px);
+  background-image: radial-gradient(var(--grid-dot) 0.7px, transparent 0.7px);
   background-size: 3px 3px;
   opacity: 0.08;
   z-index: -1;
