@@ -1121,6 +1121,9 @@ function App() {
                 </select>
               </label>
               <p className="settings-modal__hint">More backgrounds coming soon.</p>
+              <p className="settings-modal__hint" style={{ color: '#ffc400' }}>
+                Warning: For Low-End Devices, use Backgrounds at your own Risk.
+              </p>
             </div>
           </div>
         </div>
