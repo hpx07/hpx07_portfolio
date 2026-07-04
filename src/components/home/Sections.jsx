@@ -1,9 +1,9 @@
 // Home page sections — each one is a small, independent server component.
 import Link from 'next/link'
-import ProjectCard from '@/components/ProjectCard'
 import PostCard from '@/components/PostCard'
 import PlanGrid from '@/components/PlanGrid'
 import ContactForm from '@/components/ContactForm'
+import HorizontalProjects from '@/components/home/HorizontalProjects'
 
 // Brand accent per technology — drives the tinted monogram tile in the
 // "Worked with" logo wall. Any skill can override the tile with a real
@@ -113,24 +113,7 @@ export function Stats({ stats }) {
 }
 
 export function ProjectsPreview({ projects }) {
-  return (
-    <section className="section" id="projects">
-      <div className="wrap">
-        <div className="section-head">
-          <div>
-            <span className="kicker" data-reveal>01 — Selected work</span>
-            <h2 data-reveal>Projects that <em>earn their keep</em></h2>
-          </div>
-          <Link href="/projects" className="section-link" data-reveal>All projects →</Link>
-        </div>
-        <div className="proj-grid">
-          {projects.map((p, i) => (
-            <ProjectCard key={p.slug} project={p} delay={i * 0.08} />
-          ))}
-        </div>
-      </div>
-    </section>
-  )
+  return <HorizontalProjects projects={projects} />
 }
 
 export function TechStack({ skills }) {

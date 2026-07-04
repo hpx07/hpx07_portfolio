@@ -29,9 +29,11 @@ export default function ScrollFX() {
     )
     document.querySelectorAll('[data-reveal]').forEach((el) => observer.observe(el))
 
+    // Global intensity dial — bumps the drift of every [data-prlx] element.
+    const PRLX_GAIN = 1.4
     const prlxEls = Array.from(document.querySelectorAll('[data-prlx]')).map((el) => ({
       el,
-      speed: parseFloat(el.getAttribute('data-prlx')) || 0.15,
+      speed: (parseFloat(el.getAttribute('data-prlx')) || 0.15) * PRLX_GAIN,
     }))
 
     let rafId = 0

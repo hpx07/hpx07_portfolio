@@ -30,7 +30,7 @@ export default async function HomePage() {
   const on = settings.sections || {}
 
   const [projects, skills, plans, testimonials, postsData, faqs, socials] = await Promise.all([
-    on.projects !== false ? listProjects({ featuredOnly: true, limit: 4 }) : [],
+    on.projects !== false ? listProjects({ featuredOnly: true, limit: 10 }) : [],
     on.tech !== false || on.worked_with !== false ? listSkills() : [],
     on.plans !== false ? listPlans() : [],
     on.testimonials !== false ? listTestimonials() : [],

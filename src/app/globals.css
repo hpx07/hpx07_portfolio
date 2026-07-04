@@ -79,7 +79,9 @@ body {
   font-size: 16px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  /* `clip` (not `hidden`) so the body never becomes a scroll container —
+     that would break `position: sticky` on the horizontal projects pin */
+  overflow-x: clip;
 }
 
 ::selection { background: var(--amber); color: var(--ink-inverse); }
@@ -650,6 +652,79 @@ button { font: inherit; cursor: pointer; }
 .proj-links a { color: var(--amber); }
 .proj-links a:hover { text-decoration: underline; }
 .proj-links .disabled { color: var(--faint); }
+
+/* ── horizontal "Selected work" rail ─────────────────────────
+   Base = native horizontal swipe carousel (mobile / no-JS). JS adds
+   `.is-pinned` on desktop to turn vertical scroll into a pinned,
+   scroll-jacked horizontal sweep (transform driven by JS). */
+/* zero outer padding so the JS-set height + sticky math stay exact; the
+   native (unpinned) layout takes its vertical spacing from the pin itself */
+.hscroll { position: relative; padding: 0; }
+.hscroll-pin { padding-block: 4.5rem; }
+.hscroll-head { margin-bottom: 2.2rem; }
+.hscroll-viewport {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.hscroll-viewport::-webkit-scrollbar { display: none; }
+.hscroll-row {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 1.4rem;
+  width: max-content;
+  padding: 0.6rem max(1.5rem, calc((100% - var(--wrap)) / 2)) 1rem;
+  will-change: transform;
+}
+/* rail cards: fixed width, compact fixed-height media so the whole card
+   fits inside a pinned 100vh viewport; reset the masonry margin */
+.hscroll-row .proj-card {
+  flex: 0 0 clamp(280px, 82vw, 420px);
+  width: auto;
+  margin-bottom: 0;
+  scroll-snap-align: start;
+}
+.hscroll-row .proj-media { aspect-ratio: auto; height: clamp(180px, 24vh, 260px); }
+
+/* end-cap "All projects" panel */
+.hscroll-end {
+  flex: 0 0 clamp(200px, 40vw, 260px);
+  align-self: stretch;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 2rem;
+  scroll-snap-align: start;
+  transition: border-color 0.35s, background 0.35s;
+}
+.hscroll-end:hover { border-color: var(--amber); background: rgba(255, 178, 36, 0.05); }
+.hscroll-end-label { font-family: var(--font-display); font-size: 1.7rem; line-height: 1.1; }
+.hscroll-end-arrow { font-family: var(--font-mono); color: var(--amber); font-size: 1.4rem; }
+
+/* desktop pinned scroll-jack */
+.hscroll-pin.is-pinned {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  padding-block: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2rem;
+  overflow: hidden;
+}
+.hscroll-pin.is-pinned .hscroll-head { margin-bottom: 0; }
+.hscroll-pin.is-pinned .hscroll-viewport { overflow: hidden; scroll-snap-type: none; }
+.hscroll-pin.is-pinned .hscroll-row {
+  padding-block: 0;
+  transform: translate3d(0, 0, 0);
+}
+.hscroll-pin.is-pinned .hscroll-row .proj-card { flex-basis: clamp(340px, 30vw, 440px); }
 
 /* ── tech ledger ─────────────────────────────────────────── */
 .tech-cats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.4rem; }
