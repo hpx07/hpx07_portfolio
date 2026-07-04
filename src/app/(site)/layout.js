@@ -19,6 +19,11 @@ export default async function SiteLayout({ children }) {
   return (
     <>
       <div className="grid-rules" aria-hidden="true" />
+      <div className="ambient-bg" aria-hidden="true">
+        <span className="ambient-blob-a" />
+        <span className="ambient-blob-b" />
+        <span className="ambient-blob-c" />
+      </div>
       <SiteHeader settings={headerSettings} />
       <main>{children}</main>
       <SiteFooter settings={settings} socials={socials} />

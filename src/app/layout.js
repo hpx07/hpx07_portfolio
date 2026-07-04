@@ -1,7 +1,29 @@
 import './globals.css'
+import { Fraunces, Archivo, JetBrains_Mono } from 'next/font/google'
 import { getSettings } from '@/lib/repos'
 import { buildMetadata } from '@/lib/seo'
 import Analytics from '@/components/Analytics'
+
+// Self-hosted at build time (no external request, no render-blocking
+// preconnect round trip) — critical on slow/metered connections.
+const fraunces = Fraunces({
+  subsets: ['latin'],
+  axes: ['opsz'],
+  style: ['normal', 'italic'],
+  display: 'swap',
+  variable: '--font-fraunces',
+})
+const archivo = Archivo({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-archivo',
+})
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  display: 'swap',
+  variable: '--font-jbmono',
+})
 
 export async function generateMetadata() {
   const settings = await getSettings()
@@ -14,19 +36,26 @@ export default async function RootLayout({ children }) {
   const defaultTheme = settings.default_theme === 'light' ? 'light' : 'dark'
 
   return (
-    <html lang="en" data-theme={defaultTheme} data-scroll-behavior="smooth" suppressHydrationWarning>
+    <html
+      lang="en"
+      data-theme={defaultTheme}
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
+      className={`${fraunces.variable} ${archivo.variable} ${jetbrainsMono.variable}`}
+    >
       <head>
-        {/* apply the visitor's stored theme before first paint — no flash */}
+        {/* apply the visitor's theme + reduce fx for low-end/reduced-motion devices before first paint */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `try{var t=localStorage.getItem('hpx_theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}`,
+            __html: `try{
+var d=document.documentElement,t=localStorage.getItem('hpx_theme');
+if(t==='light'||t==='dark')d.dataset.theme=t;
+var nav=navigator,c=nav.hardwareConcurrency||4,mem=nav.deviceMemory||8;
+var sd=nav.connection&&(nav.connection.saveData||/2g/.test(nav.connection.effectiveType||''));
+var rm=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+if(rm||sd||c<=2||mem<=2)d.dataset.fx='lite';
+}catch(e){}`,
           }}
-        />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Archivo:wght@300..800&family=JetBrains+Mono:wght@400;500;700&display=swap"
-          rel="stylesheet"
         />
         {seo.gtm_id && (
           <script

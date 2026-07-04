@@ -31,6 +31,9 @@ function SplashCursor({
 
     // Track if the effect is still active for cleanup
     let isActive = true;
+    // Skip the WebGL work entirely while the canvas is scrolled off-screen
+    // (tab-hidden is already throttled by the browser's own rAF scheduling).
+    let visible = true;
 
     function pointerPrototype() {
       this.id = -1;
@@ -702,7 +705,7 @@ function SplashCursor({
     let colorUpdateTimer = 0.0;
 
     function updateFrame() {
-      if (!isActive) return;
+      if (!isActive || !visible) return;
       const dt = calcDeltaTime();
       if (resizeCanvas()) initFramebuffers();
       updateColors(dt);
@@ -1083,6 +1086,16 @@ function SplashCursor({
     window.addEventListener('touchmove', handleTouchMove, false);
     window.addEventListener('touchend', handleTouchEnd);
 
+    const visibilityObserver = new IntersectionObserver(
+      ([entry]) => {
+        const wasVisible = visible;
+        visible = entry.isIntersecting;
+        if (visible && !wasVisible && isActive) updateFrame();
+      },
+      { threshold: 0 },
+    );
+    visibilityObserver.observe(canvas);
+
     updateFrame();
 
     // Cleanup function
@@ -1094,6 +1107,8 @@ function SplashCursor({
         cancelAnimationFrame(animationFrameId.current);
         animationFrameId.current = null;
       }
+
+      visibilityObserver.disconnect();
 
       // Remove event listeners
       window.removeEventListener('mousedown', handleMouseDown);

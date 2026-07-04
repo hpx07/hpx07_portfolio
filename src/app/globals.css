@@ -26,9 +26,9 @@
   --menu-veil: rgba(11, 10, 8, 0.97);
   --chip-veil: rgba(20, 17, 12, 0.6);
   --veil: rgba(5, 4, 3, 0.72);
-  --font-display: 'Fraunces', Georgia, serif;
-  --font-body: 'Archivo', system-ui, -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace;
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-body: var(--font-archivo), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-jbmono), ui-monospace, 'Cascadia Code', monospace;
   --wrap: 1200px;
   --radius: 14px;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -1212,4 +1212,85 @@ a.tag:hover, .tag.active { color: var(--amber); border-color: var(--amber); }
   .admin-main { padding: 1.4rem 1rem 3rem; }
   .a-grid.cols-2, .a-grid.cols-3, .a-grid.cols-4 { grid-template-columns: 1fr; }
   .footer-cols { gap: 2rem; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Endless ambient background — three soft gradient blobs drift
+   forever behind the content. Compositor-only (transform+scale,
+   no filter:blur, no animated opacity), isolated via `contain`,
+   so it stays effectively free even on low-end hardware.
+   ═══════════════════════════════════════════════════════════ */
+.ambient-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+}
+.ambient-bg span {
+  position: absolute;
+  display: block;
+  width: 58vmax;
+  height: 58vmax;
+  border-radius: 50%;
+  will-change: transform;
+  animation: ambient-drift-a 56s var(--ease) infinite;
+}
+.ambient-blob-a {
+  top: -18vmax;
+  left: -12vmax;
+  opacity: 0.14;
+  background: radial-gradient(circle, var(--amber), transparent 70%);
+}
+.ambient-blob-b {
+  top: 28%;
+  right: -20vmax;
+  opacity: 0.11;
+  background: radial-gradient(circle, var(--rose), transparent 70%);
+  animation-name: ambient-drift-b;
+  animation-duration: 70s;
+}
+.ambient-blob-c {
+  bottom: -22vmax;
+  left: 16%;
+  opacity: 0.12;
+  background: radial-gradient(circle, var(--ember), transparent 70%);
+  animation-duration: 64s;
+  animation-delay: -18s;
+}
+@keyframes ambient-drift-a {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(6vmax, 8vmax, 0) scale(1.18); }
+}
+@keyframes ambient-drift-b {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1.1); }
+  50% { transform: translate3d(-7vmax, 6vmax, 0) scale(1); }
+}
+
+/* ── low-end / reduced-motion posture ───────────────────────
+   `data-fx="lite"` is stamped on <html> before first paint (see
+   root layout inline script) when the visitor prefers reduced
+   motion, is on a save-data/2G connection, or the device reports
+   <=2 cores / <=2GB RAM. Both cases: freeze perpetual decorative
+   loops and drop backdrop-filter (the priciest paint op on weak
+   mobile GPUs) — the veil colors are already semi-opaque, so the
+   frosted panels just fall back to a plain tinted background. */
+@media (prefers-reduced-motion: reduce) {
+  .ambient-bg span,
+  .marquee-inner,
+  .status-dot,
+  .hero-scroll::after {
+    animation: none !important;
+  }
+}
+[data-fx='lite'] .ambient-bg span,
+[data-fx='lite'] .marquee-inner,
+[data-fx='lite'] .status-dot,
+[data-fx='lite'] .hero-scroll::after {
+  animation: none !important;
+}
+[data-fx='lite'] * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
