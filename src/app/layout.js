@@ -75,7 +75,9 @@ if(rm||sd||c<=2||mem<=2)d.dataset.fx='lite';
           </>
         )}
       </head>
-      <body>
+      {/* suppressHydrationWarning: browser extensions (ColorZilla etc.) inject
+          attributes into <body> before React hydrates — harmless, silence it */}
+      <body suppressHydrationWarning>
         {seo.gtm_id && (
           <noscript>
             <iframe

@@ -1,22 +1,23 @@
 /* ═══════════════════════════════════════════════════════════
    HPX.DEV v2 — "Ember & Ivory" design system
-   Warm obsidian base · editorial serif display · ember accent
+   Dark = ngrok true black · Light = pulze white
+   Editorial serif display · ember accent
    ═══════════════════════════════════════════════════════════ */
 
 :root {
-  /* Deep, near-neutral base (ngrok-leaning) with a whisper of warmth kept
-     in the lines so the ember/ivory accents still feel at home. */
-  --bg: #0a0a0c;
-  --bg-2: #121318;
-  --bg-3: #1b1c22;
-  --card: #101015;
-  --line: rgba(242, 237, 228, 0.09);
-  --line-strong: rgba(242, 237, 228, 0.18);
-  --ink: #f2ede4;
-  --ink-inverse: #14110c;
-  --muted: #9c958a;
-  --faint: #6b655b;
-  --prose: #d9d3c8;
+  /* ngrok.com dark: true-black base (#010101 sampled), neutral #111-ish
+     surfaces, hairline white lines. Ember accents stay for brand identity. */
+  --bg: #020202;
+  --bg-2: #0f0f0f;
+  --bg-3: #181818;
+  --card: #0d0d0d;
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.17);
+  --ink: #f5f5f3;
+  --ink-inverse: #0d0d0d;
+  --muted: #9a9a94;
+  --faint: #6b6b65;
+  --prose: #d8d8d2;
   --amber: #ffb224;
   --ember: #ff6b35;
   --rose: #ff4d8d;
@@ -24,10 +25,10 @@
   --bad: #ff5c5c;
   --warn: #ffc400;
   --grad: linear-gradient(100deg, var(--amber), var(--ember) 55%, var(--rose));
-  --nav-veil: rgba(10, 10, 12, 0.82);
-  --menu-veil: rgba(10, 10, 12, 0.97);
-  --chip-veil: rgba(20, 20, 26, 0.6);
-  --veil: rgba(4, 4, 6, 0.72);
+  --nav-veil: rgba(2, 2, 2, 0.82);
+  --menu-veil: rgba(2, 2, 2, 0.97);
+  --chip-veil: rgba(16, 16, 16, 0.6);
+  --veil: rgba(0, 0, 0, 0.72);
   --font-display: var(--font-fraunces), Georgia, serif;
   --font-body: var(--font-archivo), system-ui, -apple-system, sans-serif;
   --font-mono: var(--font-jbmono), ui-monospace, 'Cascadia Code', monospace;
@@ -37,21 +38,21 @@
   color-scheme: dark;
 }
 
-/* ── professional light theme ("Ivory Ledger" → pulze-clean) ──
-   Clean, cool near-white base with crisp white cards (pulze.io-leaning),
-   graphite ink, deepened ember accents that keep WCAG AA. */
+/* ── light theme = pulze.io ──────────────────────────────────
+   Pure white base, #f6f6f7 section bands, white cards on hairline
+   borders, near-black ink; deepened ember accents keep WCAG AA. */
 [data-theme='light'] {
-  --bg: #f5f6f8;
-  --bg-2: #eceef2;
-  --bg-3: #e1e4ea;
+  --bg: #ffffff;
+  --bg-2: #f6f6f7;
+  --bg-3: #ebebee;
   --card: #ffffff;
-  --line: rgba(20, 24, 35, 0.1);
-  --line-strong: rgba(20, 24, 35, 0.2);
-  --ink: #15161a;
-  --ink-inverse: #f5f6f8;
-  --muted: #565a63;
-  --faint: #848994;
-  --prose: #33363d;
+  --line: rgba(15, 15, 18, 0.09);
+  --line-strong: rgba(15, 15, 18, 0.18);
+  --ink: #0f0f12;
+  --ink-inverse: #ffffff;
+  --muted: #55555c;
+  --faint: #8b8b92;
+  --prose: #333338;
   --amber: #a86000;
   --ember: #cf4a0e;
   --rose: #bb2560;
@@ -59,10 +60,10 @@
   --bad: #c33434;
   --warn: #8f6b00;
   --grad: linear-gradient(100deg, #c07500, #d9541a 55%, #bb2560);
-  --nav-veil: rgba(245, 246, 248, 0.85);
-  --menu-veil: rgba(245, 246, 248, 0.97);
+  --nav-veil: rgba(255, 255, 255, 0.85);
+  --menu-veil: rgba(255, 255, 255, 0.97);
   --chip-veil: rgba(255, 255, 255, 0.72);
-  --veil: rgba(20, 24, 35, 0.4);
+  --veil: rgba(15, 15, 18, 0.4);
   color-scheme: light;
 }
 
@@ -174,10 +175,16 @@ button { font: inherit; cursor: pointer; }
   clip-path: inset(0 0 100% 0);
   transition: opacity 0.9s var(--ease), transform 0.9s var(--ease), clip-path 1s var(--ease);
 }
+/* No clip-path here: applying it to every revealed element clips children
+   that intentionally overflow (plan badges, button hover lifts, shadows). */
 [data-reveal].in-view {
   opacity: 1;
   transform: none;
-  clip-path: inset(0 0 0% 0);
+}
+/* Only the 'clip' variant animates a clip-path — end with slack on every
+   side so nothing sitting on the element's edge gets shaved after reveal. */
+[data-reveal='clip'].in-view {
+  clip-path: inset(-10% -10% -10% -10%);
 }
 @media (prefers-reduced-motion: reduce) {
   [data-reveal] { opacity: 1 !important; transform: none !important; clip-path: none !important; transition: none !important; }
@@ -444,25 +451,7 @@ button { font: inherit; cursor: pointer; }
 }
 .statement em { font-style: italic; color: var(--amber); }
 
-/* marquee */
-.marquee { overflow: hidden; border-block: 1px solid var(--line); padding: 1.1rem 0; }
-.marquee-inner {
-  display: flex;
-  gap: 3.5rem;
-  width: max-content;
-  animation: marquee 30s linear infinite;
-}
-.marquee-inner span {
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--faint);
-  display: flex;
-  align-items: center;
-  gap: 3.5rem;
-}
-.marquee-inner span::after { content: '◆'; color: var(--amber); font-size: 0.5rem; }
+/* shared marquee loop (used by the "Worked with" logo wall) */
 @keyframes marquee { to { transform: translateX(-50%); } }
 
 /* ── "Worked with" — dual opposite-scrolling logo wall ───────
@@ -514,7 +503,9 @@ button { font: inherit; cursor: pointer; }
   display: flex;
   gap: 1rem;
   width: max-content;
-  padding: 0.15rem 0;
+  /* enough vertical room inside the overflow-hidden row that the chips'
+     -3px hover lift never gets clipped */
+  padding: 0.45rem 0;
   animation: marquee 42s linear infinite;
   will-change: transform;
 }
@@ -612,7 +603,7 @@ button { font: inherit; cursor: pointer; }
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(11, 10, 8, 0.75), transparent 55%);
+  background: linear-gradient(to top, rgba(2, 2, 2, 0.75), transparent 55%);
 }
 .proj-cat {
   position: absolute;
@@ -622,7 +613,7 @@ button { font: inherit; cursor: pointer; }
   font-size: 0.62rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  background: rgba(11, 10, 8, 0.7);
+  background: rgba(2, 2, 2, 0.7);
   backdrop-filter: blur(6px);
   border: 1px solid var(--line-strong);
   border-radius: 100px;
@@ -1350,7 +1341,7 @@ a.tag:hover, .tag.active { color: var(--amber); border-color: var(--amber); }
     box-shadow: 0 14px 34px -26px rgba(255, 107, 53, 0.5);
   }
   .proj-card .proj-body h3 { border-bottom-color: rgba(255, 107, 53, 0.28); }
-  .proj-cat { background: rgba(11, 10, 8, 0.82); }
+  .proj-cat { background: rgba(2, 2, 2, 0.82); }
   [data-theme='light'] .proj-card {
     background:
       linear-gradient(158deg, rgba(207, 74, 14, 0.09), rgba(168, 96, 0, 0.05) 34%, var(--card) 66%);
@@ -1402,6 +1393,11 @@ a.tag:hover, .tag.active { color: var(--amber); border-color: var(--amber); }
   animation-duration: 64s;
   animation-delay: -18s;
 }
+/* pulze's light theme stays near-white — soften the blob wash a lot */
+[data-theme='light'] .ambient-blob-a { opacity: 0.06; }
+[data-theme='light'] .ambient-blob-b { opacity: 0.05; }
+[data-theme='light'] .ambient-blob-c { opacity: 0.05;
+}
 @keyframes ambient-drift-a {
   0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
   50% { transform: translate3d(6vmax, 8vmax, 0) scale(1.18); }
@@ -1421,7 +1417,6 @@ a.tag:hover, .tag.active { color: var(--amber); border-color: var(--amber); }
    frosted panels just fall back to a plain tinted background. */
 @media (prefers-reduced-motion: reduce) {
   .ambient-bg span,
-  .marquee-inner,
   .logo-track,
   .status-dot,
   .hero-scroll::after {
@@ -1429,7 +1424,6 @@ a.tag:hover, .tag.active { color: var(--amber); border-color: var(--amber); }
   }
 }
 [data-fx='lite'] .ambient-bg span,
-[data-fx='lite'] .marquee-inner,
 [data-fx='lite'] .logo-track,
 [data-fx='lite'] .status-dot,
 [data-fx='lite'] .hero-scroll::after {

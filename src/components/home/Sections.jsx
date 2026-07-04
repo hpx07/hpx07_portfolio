@@ -56,28 +56,15 @@ export function Statement({ settings }) {
   )
 }
 
-export function Marquee({ skills }) {
-  const names = skills.map((s) => s.name)
-  return (
-    <div className="marquee" aria-hidden="true">
-      <div className="marquee-inner">
-        {[...names, ...names].map((name, i) => (
-          <span key={`${name}-${i}`}>{name}</span>
-        ))}
-      </div>
-    </div>
-  )
-}
-
 // Two logo rows scrolling in opposite directions (à la pulze.io's
-// "works with the tools you already use"). Pure-CSS marquees — the tracks
-// duplicate their chips so the loop is seamless, and both freeze under
-// reduced-motion / low-end (data-fx="lite") via the global gate.
+// "works with the tools you already use"). Pure-CSS marquees. Each row
+// carries the FULL skill list (row B reversed), tiled twice per loop-half so
+// the belt is endless with no gap even on ultra-wide screens; both freeze
+// under reduced-motion / low-end (data-fx="lite") via the global gate.
 export function WorkedWith({ skills = [] }) {
   if (!skills.length) return null
-  const half = Math.ceil(skills.length / 2)
-  const rowA = skills.slice(0, half)
-  const rowB = skills.slice(half).length ? skills.slice(half) : rowA
+  const rowA = [...skills, ...skills]
+  const rowB = [...skills, ...skills].reverse()
 
   return (
     <section className="section-tight worked" id="worked">

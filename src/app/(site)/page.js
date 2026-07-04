@@ -11,7 +11,6 @@ import {
 import Hero from '@/components/home/Hero'
 import {
   Statement,
-  Marquee,
   WorkedWith,
   Stats,
   ProjectsPreview,
@@ -43,7 +42,6 @@ export default async function HomePage() {
   return (
     <>
       {on.hero !== false && <Hero settings={settings} />}
-      {on.tech !== false && skills.length > 0 && <Marquee skills={skills} />}
       {on.statement !== false && <Statement settings={settings} />}
       {on.worked_with !== false && skills.length > 0 && <WorkedWith skills={skills} />}
       {on.stats !== false && <Stats stats={settings.stats || []} />}

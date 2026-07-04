@@ -28,7 +28,7 @@ export default function AdminSkillsPage() {
     <ResourceManager
       resource="skills"
       title="Skills"
-      description="Tools & technologies — grouped by category on the home page ledger and the marquee."
+      description="Tools & technologies — grouped by category on the home page ledger and scrolling in the Worked-with logo wall."
       fields={fields}
       columns={columns}
     />
