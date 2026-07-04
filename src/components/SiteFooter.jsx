@@ -47,6 +47,7 @@ export default function SiteFooter({ settings, socials = [] }) {
             </div>
           </div>
         </div>
+        <p className="footer-wordmark" aria-hidden="true">{settings.logo_text || settings.site_name}</p>
         <div className="footer-base">
           <span>© {year} {settings.site_owner} · {settings.site_name}</span>
           <span>{settings.footer_note}</span>

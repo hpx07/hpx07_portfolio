@@ -5,6 +5,37 @@ import PostCard from '@/components/PostCard'
 import PlanGrid from '@/components/PlanGrid'
 import ContactForm from '@/components/ContactForm'
 
+// Brand accent per technology — drives the tinted monogram tile in the
+// "Worked with" logo wall. Any skill can override the tile with a real
+// uploaded logo (skill.icon) from Admin → Skills. Unknown names fall back
+// to the ember accent. Kept inline (no icon dependency / no network) so the
+// wall stays instant on low-end devices.
+const BRAND = {
+  javascript: '#f7df1e', typescript: '#3178c6', php: '#787cb5', sql: '#00758f',
+  mysql: '#4479a1', mariadb: '#5a86a0', react: '#61dafb', 'next.js': 'var(--ink)',
+  'node.js': '#5fa04e', express: 'var(--ink)', gsap: '#0ae448', capacitor: '#119eff',
+  'capacitor.js': '#119eff', 'android studio': '#3ddc84', photoshop: '#31a8ff',
+  lightroom: '#4ea7ff', 'git & ci': '#f05032', git: '#f05032', claude: '#d97757',
+  copilot: 'var(--ink)', html: '#e34f26', css: '#1572b6', 'socket.io': 'var(--ink)',
+  bootstrap: '#7952b3', python: '#4b8bbe', 'youtube api': '#ff0000',
+}
+
+function SkillChip({ skill }) {
+  const brand = BRAND[String(skill.name || '').toLowerCase()] || 'var(--amber)'
+  return (
+    <span className="logo-chip" style={{ '--brand': brand }}>
+      <span className="logo-mark">
+        {skill.icon ? (
+          <img src={skill.icon} alt="" loading="lazy" />
+        ) : (
+          String(skill.name || '?').trim().charAt(0).toUpperCase()
+        )}
+      </span>
+      <span className="logo-name">{skill.name}</span>
+    </span>
+  )
+}
+
 export function Statement({ settings }) {
   return (
     <section className="section-tight statement">
@@ -35,6 +66,45 @@ export function Marquee({ skills }) {
         ))}
       </div>
     </div>
+  )
+}
+
+// Two logo rows scrolling in opposite directions (à la pulze.io's
+// "works with the tools you already use"). Pure-CSS marquees — the tracks
+// duplicate their chips so the loop is seamless, and both freeze under
+// reduced-motion / low-end (data-fx="lite") via the global gate.
+export function WorkedWith({ skills = [] }) {
+  if (!skills.length) return null
+  const half = Math.ceil(skills.length / 2)
+  const rowA = skills.slice(0, half)
+  const rowB = skills.slice(half).length ? skills.slice(half) : rowA
+
+  return (
+    <section className="section-tight worked" id="worked">
+      <div className="wrap">
+        <div className="worked-head" data-reveal>
+          <span className="kicker">Toolbox</span>
+          <h2>Worked with the tools <em>that ship</em></h2>
+          <p>The stack behind every build — from first commit to production monitoring.</p>
+        </div>
+      </div>
+      <div className="logowall" aria-hidden="true">
+        <div className="logo-row">
+          <div className="logo-track">
+            {[...rowA, ...rowA].map((s, i) => (
+              <SkillChip key={`a-${s.id || s.name}-${i}`} skill={s} />
+            ))}
+          </div>
+        </div>
+        <div className="logo-row">
+          <div className="logo-track rev">
+            {[...rowB, ...rowB].map((s, i) => (
+              <SkillChip key={`b-${s.id || s.name}-${i}`} skill={s} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
   )
 }
 

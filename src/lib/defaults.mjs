@@ -34,6 +34,7 @@ export const DEFAULT_SETTINGS = {
   sections: {
     hero: true,
     statement: true,
+    worked_with: true,
     stats: true,
     projects: true,
     tech: true,

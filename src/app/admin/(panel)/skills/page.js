@@ -5,6 +5,13 @@ const fields = [
   { name: 'category', label: 'Category (Languages / Frameworks / Tools / AI Workflow…)', half: true },
   { name: 'level', label: 'Proficiency (0–100)', type: 'number', half: true, default: 80 },
   { name: 'sort_order', label: 'Sort order', type: 'number', half: true, default: 0 },
+  {
+    name: 'icon',
+    label: 'Logo (optional)',
+    type: 'image',
+    kind: 'media',
+    hint: 'Shown in the "Worked with" marquee. Leave blank to use a tinted monogram tile.',
+  },
   { name: 'active', label: 'Active', type: 'switch', half: true, default: 1 },
 ]
 

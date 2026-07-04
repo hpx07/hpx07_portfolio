@@ -4,10 +4,12 @@
    ═══════════════════════════════════════════════════════════ */
 
 :root {
-  --bg: #0b0a08;
-  --bg-2: #14110c;
-  --bg-3: #1c1811;
-  --card: #141109;
+  /* Deep, near-neutral base (ngrok-leaning) with a whisper of warmth kept
+     in the lines so the ember/ivory accents still feel at home. */
+  --bg: #0a0a0c;
+  --bg-2: #121318;
+  --bg-3: #1b1c22;
+  --card: #101015;
   --line: rgba(242, 237, 228, 0.09);
   --line-strong: rgba(242, 237, 228, 0.18);
   --ink: #f2ede4;
@@ -22,10 +24,10 @@
   --bad: #ff5c5c;
   --warn: #ffc400;
   --grad: linear-gradient(100deg, var(--amber), var(--ember) 55%, var(--rose));
-  --nav-veil: rgba(11, 10, 8, 0.82);
-  --menu-veil: rgba(11, 10, 8, 0.97);
-  --chip-veil: rgba(20, 17, 12, 0.6);
-  --veil: rgba(5, 4, 3, 0.72);
+  --nav-veil: rgba(10, 10, 12, 0.82);
+  --menu-veil: rgba(10, 10, 12, 0.97);
+  --chip-veil: rgba(20, 20, 26, 0.6);
+  --veil: rgba(4, 4, 6, 0.72);
   --font-display: var(--font-fraunces), Georgia, serif;
   --font-body: var(--font-archivo), system-ui, -apple-system, sans-serif;
   --font-mono: var(--font-jbmono), ui-monospace, 'Cascadia Code', monospace;
@@ -35,21 +37,21 @@
   color-scheme: dark;
 }
 
-/* ── professional light theme ("Ivory Ledger") ─────────────
-   Same warm-editorial identity, inverted: paper ivory base,
+/* ── professional light theme ("Ivory Ledger" → pulze-clean) ──
+   Clean, cool near-white base with crisp white cards (pulze.io-leaning),
    graphite ink, deepened ember accents that keep WCAG AA. */
 [data-theme='light'] {
-  --bg: #faf8f4;
-  --bg-2: #f1ede5;
-  --bg-3: #e7e1d5;
+  --bg: #f5f6f8;
+  --bg-2: #eceef2;
+  --bg-3: #e1e4ea;
   --card: #ffffff;
-  --line: rgba(30, 25, 16, 0.1);
-  --line-strong: rgba(30, 25, 16, 0.22);
-  --ink: #211c13;
-  --ink-inverse: #faf8f4;
-  --muted: #5c564a;
-  --faint: #8a8375;
-  --prose: #3a3529;
+  --line: rgba(20, 24, 35, 0.1);
+  --line-strong: rgba(20, 24, 35, 0.2);
+  --ink: #15161a;
+  --ink-inverse: #f5f6f8;
+  --muted: #565a63;
+  --faint: #848994;
+  --prose: #33363d;
   --amber: #a86000;
   --ember: #cf4a0e;
   --rose: #bb2560;
@@ -57,10 +59,10 @@
   --bad: #c33434;
   --warn: #8f6b00;
   --grad: linear-gradient(100deg, #c07500, #d9541a 55%, #bb2560);
-  --nav-veil: rgba(250, 248, 244, 0.85);
-  --menu-veil: rgba(250, 248, 244, 0.97);
+  --nav-veil: rgba(245, 246, 248, 0.85);
+  --menu-veil: rgba(245, 246, 248, 0.97);
   --chip-veil: rgba(255, 255, 255, 0.72);
-  --veil: rgba(35, 30, 20, 0.4);
+  --veil: rgba(20, 24, 35, 0.4);
   color-scheme: light;
 }
 
@@ -463,6 +465,94 @@ button { font: inherit; cursor: pointer; }
 .marquee-inner span::after { content: '◆'; color: var(--amber); font-size: 0.5rem; }
 @keyframes marquee { to { transform: translateX(-50%); } }
 
+/* ── "Worked with" — dual opposite-scrolling logo wall ───────
+   Light theme leans pulze.io (airy, soft aurora wash); dark theme
+   leans ngrok (deep, minimal). Both marquees are pure CSS. */
+.worked { position: relative; overflow: hidden; }
+.worked::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(60% 60% at 22% 12%, rgba(255, 178, 36, 0.10), transparent 60%),
+    radial-gradient(55% 55% at 82% 84%, rgba(255, 77, 141, 0.09), transparent 60%);
+  pointer-events: none;
+}
+[data-theme='light'] .worked::before {
+  background:
+    radial-gradient(55% 60% at 18% 10%, rgba(120, 170, 255, 0.22), transparent 62%),
+    radial-gradient(50% 55% at 84% 20%, rgba(255, 150, 190, 0.20), transparent 62%),
+    radial-gradient(60% 60% at 60% 92%, rgba(160, 230, 200, 0.20), transparent 64%);
+}
+.worked-head { text-align: center; max-width: 40ch; margin: 0 auto 2.6rem; position: relative; z-index: 1; }
+.worked-head .kicker { justify-content: center; }
+.worked-head h2 {
+  font-family: var(--font-display);
+  font-weight: 440;
+  font-size: clamp(1.8rem, 4.4vw, 3rem);
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  margin: 1rem 0 0.7rem;
+}
+.worked-head h2 em { font-style: italic; color: var(--amber); }
+.worked-head p { color: var(--muted); font-size: 0.95rem; }
+
+.logowall {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+.logo-row {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
+}
+.logo-track {
+  display: flex;
+  gap: 1rem;
+  width: max-content;
+  padding: 0.15rem 0;
+  animation: marquee 42s linear infinite;
+  will-change: transform;
+}
+.logo-track.rev { animation-direction: reverse; }
+.logo-row:hover .logo-track { animation-play-state: paused; }
+
+.logo-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.6rem 1.15rem 0.6rem 0.65rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 100px;
+  background: var(--card);
+  white-space: nowrap;
+  transition: border-color 0.3s, transform 0.3s var(--ease), background 0.3s;
+}
+.logo-chip:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--brand) 55%, var(--line-strong));
+}
+.logo-mark {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--brand);
+  background: color-mix(in srgb, var(--brand) 16%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--brand) 26%, transparent);
+}
+.logo-mark img { width: 100%; height: 100%; object-fit: contain; border-radius: 9px; padding: 3px; }
+.logo-name { font-size: 0.92rem; font-weight: 600; color: var(--prose); }
+
 /* ── stats ───────────────────────────────────────────────── */
 .stat-grid {
   display: grid;
@@ -490,10 +580,18 @@ button { font: inherit; cursor: pointer; }
 .stat span { color: var(--muted); font-size: 0.85rem; }
 
 /* ── project cards ───────────────────────────────────────── */
-.proj-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.4rem; }
+/* Masonry wall like ngrok's "developers go on and on about us" — plain
+   CSS columns (no JS): cards flow into the shortest column, so the mix of
+   image heights + description lengths staggers naturally. Collapses to one
+   clean full-width column on mobile. */
+.proj-grid { columns: 2; column-gap: 1.4rem; }
 .proj-card {
   position: relative;
-  border: 1px solid var(--line);
+  width: 100%;
+  min-width: 0;
+  break-inside: avoid;
+  margin-bottom: 1.4rem;
+  border: 1px solid var(--line-strong);
   border-radius: var(--radius);
   overflow: hidden;
   background: var(--card);
@@ -532,7 +630,14 @@ button { font: inherit; cursor: pointer; }
   color: var(--amber);
 }
 .proj-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 0.8rem; flex: 1; }
-.proj-body h3 { font-family: var(--font-display); font-weight: 480; font-size: 1.45rem; }
+.proj-body h3 {
+  font-family: var(--font-display);
+  font-weight: 560;
+  font-size: 1.55rem;
+  line-height: 1.15;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--line);
+}
 .proj-body p { color: var(--muted); font-size: 0.92rem; }
 .proj-tech { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: auto; padding-top: 0.6rem; }
 .proj-tech span {
@@ -544,7 +649,7 @@ button { font: inherit; cursor: pointer; }
   padding: 0.25rem 0.55rem;
   color: var(--muted);
 }
-.proj-links { display: flex; gap: 1.2rem; padding-top: 0.9rem; border-top: 1px solid var(--line); margin-top: 0.9rem; }
+.proj-links { display: flex; flex-wrap: wrap; gap: 0.6rem 1.2rem; padding-top: 0.9rem; border-top: 1px solid var(--line); margin-top: 0.9rem; }
 .proj-links a, .proj-links span {
   font-family: var(--font-mono);
   font-size: 0.68rem;
@@ -877,6 +982,27 @@ a.tag:hover, .tag.active { color: var(--amber); border-color: var(--amber); }
 .footer-col h4 { font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--faint); margin-bottom: 0.9rem; }
 .footer-col a { display: block; color: var(--muted); font-size: 0.88rem; padding: 0.25rem 0; transition: color 0.25s; }
 .footer-col a:hover { color: var(--amber); }
+/* Oversized brand wordmark that dissolves into the page bottom — the big
+   "sinking" footer signature ngrok uses. Gradient-clipped text, so it fades
+   to transparent rather than sitting as a flat block. */
+.footer-wordmark {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(4rem, 21vw, 15rem);
+  line-height: 0.82;
+  letter-spacing: -0.04em;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  user-select: none;
+  margin: 2.4rem -0.01em -0.1em 0;
+  background: linear-gradient(180deg, var(--ink), transparent 86%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  opacity: 0.1;
+}
+[data-theme='light'] .footer-wordmark { opacity: 0.14; }
 .footer-base {
   display: flex;
   justify-content: space-between;
@@ -1186,7 +1312,8 @@ a.tag:hover, .tag.active { color: var(--amber); border-color: var(--amber); }
 
 /* ── responsive ──────────────────────────────────────────── */
 @media (max-width: 1020px) {
-  .proj-grid, .tech-cats { grid-template-columns: 1fr; }
+  .proj-grid { columns: 1; }
+  .tech-cats { grid-template-columns: 1fr; }
   .post-grid, .tsl-grid, .plan-grid { grid-template-columns: repeat(2, 1fr); }
   .process-grid { grid-template-columns: repeat(2, 1fr); }
   .stat-grid { grid-template-columns: repeat(2, 1fr); }
@@ -1212,6 +1339,22 @@ a.tag:hover, .tag.active { color: var(--amber); border-color: var(--amber); }
   .admin-main { padding: 1.4rem 1rem 3rem; }
   .a-grid.cols-2, .a-grid.cols-3, .a-grid.cols-4 { grid-template-columns: 1fr; }
   .footer-cols { gap: 2rem; }
+
+  /* Mobile project cards get an explicit warm-ember surface so each card
+     reads as its own object on a full-bleed single column, instead of a
+     flat panel melting into the page. Accent: ember #ff6b35 over card. */
+  .proj-card {
+    background:
+      linear-gradient(158deg, rgba(255, 107, 53, 0.12), rgba(255, 178, 36, 0.05) 34%, var(--card) 68%);
+    border-color: var(--line-strong);
+    box-shadow: 0 14px 34px -26px rgba(255, 107, 53, 0.5);
+  }
+  .proj-card .proj-body h3 { border-bottom-color: rgba(255, 107, 53, 0.28); }
+  .proj-cat { background: rgba(11, 10, 8, 0.82); }
+  [data-theme='light'] .proj-card {
+    background:
+      linear-gradient(158deg, rgba(207, 74, 14, 0.09), rgba(168, 96, 0, 0.05) 34%, var(--card) 66%);
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -1279,6 +1422,7 @@ a.tag:hover, .tag.active { color: var(--amber); border-color: var(--amber); }
 @media (prefers-reduced-motion: reduce) {
   .ambient-bg span,
   .marquee-inner,
+  .logo-track,
   .status-dot,
   .hero-scroll::after {
     animation: none !important;
@@ -1286,6 +1430,7 @@ a.tag:hover, .tag.active { color: var(--amber); border-color: var(--amber); }
 }
 [data-fx='lite'] .ambient-bg span,
 [data-fx='lite'] .marquee-inner,
+[data-fx='lite'] .logo-track,
 [data-fx='lite'] .status-dot,
 [data-fx='lite'] .hero-scroll::after {
   animation: none !important;

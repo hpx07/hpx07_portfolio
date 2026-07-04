@@ -12,6 +12,7 @@ import Hero from '@/components/home/Hero'
 import {
   Statement,
   Marquee,
+  WorkedWith,
   Stats,
   ProjectsPreview,
   TechStack,
@@ -31,7 +32,7 @@ export default async function HomePage() {
 
   const [projects, skills, plans, testimonials, postsData, faqs, socials] = await Promise.all([
     on.projects !== false ? listProjects({ featuredOnly: true, limit: 4 }) : [],
-    on.tech !== false ? listSkills() : [],
+    on.tech !== false || on.worked_with !== false ? listSkills() : [],
     on.plans !== false ? listPlans() : [],
     on.testimonials !== false ? listTestimonials() : [],
     on.blog !== false ? listPosts({ perPage: 3 }) : { posts: [] },
@@ -44,6 +45,7 @@ export default async function HomePage() {
       {on.hero !== false && <Hero settings={settings} />}
       {on.tech !== false && skills.length > 0 && <Marquee skills={skills} />}
       {on.statement !== false && <Statement settings={settings} />}
+      {on.worked_with !== false && skills.length > 0 && <WorkedWith skills={skills} />}
       {on.stats !== false && <Stats stats={settings.stats || []} />}
       {on.projects !== false && projects.length > 0 && <ProjectsPreview projects={projects} />}
       {on.tech !== false && skills.length > 0 && <TechStack skills={skills} />}

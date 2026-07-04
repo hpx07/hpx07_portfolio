@@ -8,6 +8,7 @@ const TABS = ['Brand', 'Home content', 'Sections & pages', 'SEO', 'Data']
 const SECTION_LABELS = {
   hero: 'Hero',
   statement: 'Statement',
+  worked_with: 'Worked with (logo marquee)',
   stats: 'Stats strip',
   projects: 'Projects preview',
   tech: 'Tools & technologies',
