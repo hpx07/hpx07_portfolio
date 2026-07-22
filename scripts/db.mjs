@@ -53,6 +53,20 @@ const DIALECT = String(
   flag('dialect', process.env.DB_DIALECT || (PG_URL ? 'postgres' : 'mysql')),
 ).toLowerCase()
 
+// Strip sslmode/ssl from a Postgres URL so our explicit `ssl` option wins (pg
+// parses the connection string after the config object). Without this, Supabase's
+// `?sslmode=require` re-enables cert validation and throws "self-signed certificate".
+function pgConnString(url) {
+  try {
+    const u = new URL(url)
+    u.searchParams.delete('sslmode')
+    u.searchParams.delete('ssl')
+    return u.toString()
+  } catch {
+    return url
+  }
+}
+
 // ── connections ──────────────────────────────────────────────
 async function connect(dialect, { withoutDb = false } = {}) {
   if (dialect === 'mysql') {
@@ -70,7 +84,7 @@ async function connect(dialect, { withoutDb = false } = {}) {
   if (dialect === 'postgres') {
     const { Client } = await import('pg')
     const client = PG_URL
-      ? new Client({ connectionString: PG_URL, ssl: { rejectUnauthorized: false } })
+      ? new Client({ connectionString: pgConnString(PG_URL), ssl: { rejectUnauthorized: false } })
       : new Client({
           host: process.env.PG_HOST || '127.0.0.1',
           port: Number(process.env.PG_PORT || 5432),
