@@ -40,7 +40,18 @@ const flag = (name, fallback = undefined) => {
   return args.includes(`--${name}`) ? true : fallback
 }
 
-const DIALECT = String(flag('dialect', process.env.DB_DIALECT || 'mysql')).toLowerCase()
+// A hosted Postgres connection URL, if a provider injected one. Prefer the
+// direct (non-pooling) URL for DDL/migrations; fall back to the pooled one.
+const PG_URL =
+  process.env.POSTGRES_URL_NON_POOLING ||
+  process.env.DATABASE_URL ||
+  process.env.PG_URL ||
+  process.env.POSTGRES_URL ||
+  ''
+
+const DIALECT = String(
+  flag('dialect', process.env.DB_DIALECT || (PG_URL ? 'postgres' : 'mysql')),
+).toLowerCase()
 
 // ── connections ──────────────────────────────────────────────
 async function connect(dialect, { withoutDb = false } = {}) {
@@ -58,13 +69,15 @@ async function connect(dialect, { withoutDb = false } = {}) {
   }
   if (dialect === 'postgres') {
     const { Client } = await import('pg')
-    const client = new Client({
-      host: process.env.PG_HOST || '127.0.0.1',
-      port: Number(process.env.PG_PORT || 5432),
-      user: process.env.PG_USER || 'postgres',
-      password: process.env.PG_PASSWORD || 'postgres',
-      database: withoutDb ? 'postgres' : process.env.PG_DATABASE || 'hpx_v2',
-    })
+    const client = PG_URL
+      ? new Client({ connectionString: PG_URL, ssl: { rejectUnauthorized: false } })
+      : new Client({
+          host: process.env.PG_HOST || '127.0.0.1',
+          port: Number(process.env.PG_PORT || 5432),
+          user: process.env.PG_USER || 'postgres',
+          password: process.env.PG_PASSWORD || 'postgres',
+          database: withoutDb ? 'postgres' : process.env.PG_DATABASE || 'hpx_v2',
+        })
     await client.connect()
     return client
   }
@@ -113,7 +126,9 @@ async function cmdInit(dialect = DIALECT) {
       `CREATE DATABASE IF NOT EXISTS \`${dbName}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`,
     )
     await raw.end()
-  } else if (dialect === 'postgres') {
+  } else if (dialect === 'postgres' && !PG_URL) {
+    // A hosted Postgres URL (e.g. Supabase) already points at an existing
+    // database and can't CREATE DATABASE, so only do this for a local server.
     const dbName = process.env.PG_DATABASE || 'hpx_v2'
     const raw = await connect(dialect, { withoutDb: true })
     const exists = await raw.query('SELECT 1 FROM pg_database WHERE datname = $1', [dbName])

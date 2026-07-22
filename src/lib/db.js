@@ -2,7 +2,19 @@
 // Write queries with `?` placeholders; they are translated per dialect.
 // Supported: mysql (mysql2), postgres (pg), sqlite (better-sqlite3).
 
-const DIALECT = (process.env.DB_DIALECT || 'mysql').toLowerCase()
+// A hosted Postgres connection URL, if a provider injected one.
+// Vercel's Supabase integration sets POSTGRES_URL (pooled). Also honour the
+// common DATABASE_URL / PG_URL names and Supabase's non-pooling fallback.
+const PG_URL =
+  process.env.POSTGRES_URL ||
+  process.env.DATABASE_URL ||
+  process.env.PG_URL ||
+  process.env.POSTGRES_URL_NON_POOLING ||
+  ''
+
+// Explicit DB_DIALECT always wins. Otherwise auto-detect Postgres from an
+// injected URL (e.g. Supabase on Vercel), else fall back to mysql (XAMPP local).
+const DIALECT = (process.env.DB_DIALECT || (PG_URL ? 'postgres' : 'mysql')).toLowerCase()
 
 let _client = null
 
@@ -27,14 +39,23 @@ async function getClient() {
     })
   } else if (DIALECT === 'postgres') {
     const { Pool } = await import('pg')
-    _client = new Pool({
-      host: process.env.PG_HOST || '127.0.0.1',
-      port: Number(process.env.PG_PORT || 5432),
-      user: process.env.PG_USER || 'postgres',
-      password: process.env.PG_PASSWORD || 'postgres',
-      database: process.env.PG_DATABASE || 'hpx_v2',
-      max: 10,
-    })
+    _client = PG_URL
+      ? new Pool({
+          connectionString: PG_URL,
+          // Supabase/hosted Postgres require TLS. The pooler certificate isn't in
+          // Node's default CA bundle, so keep the connection encrypted without
+          // enforcing chain validation.
+          ssl: { rejectUnauthorized: false },
+          max: 10,
+        })
+      : new Pool({
+          host: process.env.PG_HOST || '127.0.0.1',
+          port: Number(process.env.PG_PORT || 5432),
+          user: process.env.PG_USER || 'postgres',
+          password: process.env.PG_PASSWORD || 'postgres',
+          database: process.env.PG_DATABASE || 'hpx_v2',
+          max: 10,
+        })
   } else if (DIALECT === 'sqlite') {
     const Database = (await import('better-sqlite3')).default
     const path = await import('node:path')
