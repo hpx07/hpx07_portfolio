@@ -117,8 +117,11 @@ export async function run(sql, params = []) {
       const res = await client.query(pgSql, params)
       return { insertId: res.rows?.[0]?.id ?? null, affected: res.rowCount }
     } catch (err) {
-      // Table without an id column (e.g. settings) — retry without RETURNING
-      if (isInsert && /returning/i.test(String(err.message))) {
+      // The RETURNING id we appended fails on tables that have no `id` column
+      // (e.g. settings, PK skey). Postgres raises 42703 (undefined_column) during
+      // parse — before any row is written — so retrying without RETURNING is safe.
+      const noIdColumn = err.code === '42703' || /returning|column .*"?id"?/i.test(String(err.message))
+      if (isInsert && noIdColumn) {
         const res = await client.query(toPgPlaceholders(sql), params)
         return { insertId: null, affected: res.rowCount }
       }
