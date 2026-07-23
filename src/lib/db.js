@@ -16,6 +16,21 @@ const PG_URL =
 // injected URL (e.g. Supabase on Vercel), else fall back to mysql (XAMPP local).
 const DIALECT = (process.env.DB_DIALECT || (PG_URL ? 'postgres' : 'mysql')).toLowerCase()
 
+// Drop any sslmode/ssl query param from a Postgres URL. pg parses the connection
+// string *after* the config object, so a URL's `?sslmode=require` would otherwise
+// override our explicit `ssl` option and re-enable cert-chain validation — which
+// fails against Supabase's pooler cert ("self-signed certificate in chain").
+function pgConnString(url) {
+  try {
+    const u = new URL(url)
+    u.searchParams.delete('sslmode')
+    u.searchParams.delete('ssl')
+    return u.toString()
+  } catch {
+    return url
+  }
+}
+
 let _client = null
 
 export function getDialect() {
@@ -41,7 +56,7 @@ async function getClient() {
     const { Pool } = await import('pg')
     _client = PG_URL
       ? new Pool({
-          connectionString: PG_URL,
+          connectionString: pgConnString(PG_URL),
           // Supabase/hosted Postgres require TLS. The pooler certificate isn't in
           // Node's default CA bundle, so keep the connection encrypted without
           // enforcing chain validation.
@@ -102,8 +117,11 @@ export async function run(sql, params = []) {
       const res = await client.query(pgSql, params)
       return { insertId: res.rows?.[0]?.id ?? null, affected: res.rowCount }
     } catch (err) {
-      // Table without an id column (e.g. settings) — retry without RETURNING
-      if (isInsert && /returning/i.test(String(err.message))) {
+      // The RETURNING id we appended fails on tables that have no `id` column
+      // (e.g. settings, PK skey). Postgres raises 42703 (undefined_column) during
+      // parse — before any row is written — so retrying without RETURNING is safe.
+      const noIdColumn = err.code === '42703' || /returning|column .*"?id"?/i.test(String(err.message))
+      if (isInsert && noIdColumn) {
         const res = await client.query(toPgPlaceholders(sql), params)
         return { insertId: null, affected: res.rowCount }
       }
