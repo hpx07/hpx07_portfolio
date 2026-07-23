@@ -41,7 +41,9 @@ export default function Hero({ settings }) {
           {settings.hero_copy}
         </p>
         <div className="hero-actions" data-reveal style={{ '--reveal-delay': '0.24s' }}>
-          <Link href="/projects" className="btn btn-ember">View projects</Link>
+          <Link href="/projects" className="btn-splat" aria-label="View projects">
+            <span>View projects</span>
+          </Link>
           <Link href="/plans" className="btn btn-ghost">See plans</Link>
         </div>
         <div className="hero-meta" data-reveal style={{ '--reveal-delay': '0.32s' }}>
