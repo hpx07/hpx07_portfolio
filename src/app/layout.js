@@ -33,7 +33,9 @@ export async function generateMetadata() {
 export default async function RootLayout({ children }) {
   const settings = await getSettings()
   const seo = settings.seo || {}
-  const defaultTheme = settings.default_theme === 'light' ? 'light' : 'dark'
+  const defaultTheme = ['light', 'pine'].includes(settings.default_theme)
+    ? settings.default_theme
+    : 'dark'
 
   return (
     <html
@@ -49,7 +51,7 @@ export default async function RootLayout({ children }) {
           dangerouslySetInnerHTML={{
             __html: `try{
 var d=document.documentElement,t=localStorage.getItem('hpx_theme');
-if(t==='light'||t==='dark')d.dataset.theme=t;
+if(t==='light'||t==='dark'||t==='pine')d.dataset.theme=t;
 var nav=navigator,c=nav.hardwareConcurrency||4,mem=nav.deviceMemory||8;
 var sd=nav.connection&&(nav.connection.saveData||/2g/.test(nav.connection.effectiveType||''));
 var rm=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
