@@ -329,12 +329,6 @@ button { font: inherit; cursor: pointer; }
   letter-spacing: 0.02em;
 }
 .brand img { height: 30px; width: auto; }
-.brand-dot {
-  width: 9px; height: 9px;
-  border-radius: 50%;
-  background: var(--grad);
-  box-shadow: 0 0 14px var(--ember);
-}
 .nav-links { display: flex; align-items: center; gap: 1.9rem; }
 .nav-links a {
   font-size: 0.88rem;

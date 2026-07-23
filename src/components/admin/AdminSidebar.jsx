@@ -34,7 +34,6 @@ export default function AdminSidebar() {
   return (
     <aside className="admin-side">
       <Link href="/" className="brand" target="_blank">
-        <span className="brand-dot" aria-hidden="true" />
         <span>HPX Admin</span>
       </Link>
       {NAV.map((item, i) =>

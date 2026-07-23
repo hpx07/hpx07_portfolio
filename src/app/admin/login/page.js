@@ -33,7 +33,6 @@ function LoginForm() {
     <div className="login-shell">
       <form className="login-card" onSubmit={onSubmit}>
         <div className="brand">
-          <span className="brand-dot" aria-hidden="true" />
           <span>HPX.DEV</span>
         </div>
         <h1>Admin panel</h1>
