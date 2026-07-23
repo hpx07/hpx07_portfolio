@@ -4,10 +4,11 @@ import { useEffect } from 'react'
 
 // Site-wide momentum ("smooth") scrolling.
 //
-// Interpolates the real window scroll position toward a wheel-driven target
-// with a single rAF lerp — so the native scrollbar, `position: sticky`
-// (the horizontal-projects pin) and anchor jumps all keep working; we only
-// smooth the *rate* at which scrollY changes.
+// Interpolates the real window scroll position toward a target with a single
+// rAF lerp — so the native scrollbar and `position: sticky` (the horizontal-
+// projects pin) keep working; we only smooth the *rate* at which scrollY
+// changes. The target is driven by the wheel and by in-page anchor clicks
+// (which glide, offset for the fixed header, instead of jumping).
 //
 // Deliberately conservative — it bows out entirely when it shouldn't run:
 //  • reduced-motion / low-end devices (the sitewide data-fx="lite" gate)
@@ -54,6 +55,12 @@ export default function SmoothScroll() {
         running = true
         rafId = requestAnimationFrame(tick)
       }
+    }
+
+    // Glide to an absolute Y using the same lerp the wheel drives.
+    const scrollToY = (y) => {
+      target = clamp(y)
+      start()
     }
 
     // Let native scrolling win inside an element that can itself scroll along
@@ -105,12 +112,39 @@ export default function SmoothScroll() {
       }
     }
 
+    // Smooth in-page anchor links (href="#id" / same-page "/#id") through the
+    // lerp instead of an instant jump, offset for the fixed header.
+    const onClick = (e) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+      const a = e.target.closest?.('a')
+      if (!a) return
+      const href = a.getAttribute('href') || ''
+      let hash = ''
+      if (href.startsWith('#')) hash = href
+      else if (href.startsWith('/#') && window.location.pathname === '/') hash = href.slice(1)
+      if (hash.length < 2) return
+
+      const el = document.getElementById(decodeURIComponent(hash.slice(1)))
+      if (!el) return
+
+      e.preventDefault()
+      const navH = document.querySelector('.site-nav')?.offsetHeight || 0
+      scrollToY(window.scrollY + el.getBoundingClientRect().top - navH - 12)
+      if (window.location.hash !== hash) history.pushState(null, '', hash)
+
+      // Keep keyboard focus in step, without letting focus() re-jump the page.
+      if (el.tabIndex < 0) el.setAttribute('tabindex', '-1')
+      el.focus({ preventScroll: true })
+    }
+
     window.addEventListener('wheel', onWheel, { passive: false })
     window.addEventListener('scroll', onScroll, { passive: true })
+    document.addEventListener('click', onClick)
 
     return () => {
       window.removeEventListener('wheel', onWheel)
       window.removeEventListener('scroll', onScroll)
+      document.removeEventListener('click', onClick)
       cancelAnimationFrame(rafId)
       root.style.scrollBehavior = prevScrollBehavior
     }
