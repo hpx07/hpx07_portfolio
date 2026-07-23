@@ -717,7 +717,11 @@ button { font: inherit; cursor: pointer; }
   flex-wrap: nowrap;
   gap: 1.4rem;
   width: max-content;
-  padding: 0.6rem max(1.5rem, calc((100% - var(--wrap)) / 2)) 1rem;
+  /* Left lead-in = site gutter + an extra 2.5rem so the first card starts
+     clearly inset from the edge (not flush). Right keeps the plain gutter. */
+  padding-block: 0.6rem 1rem;
+  padding-right: max(1.5rem, calc((100% - var(--wrap)) / 2));
+  padding-left: calc(max(1.5rem, (100% - var(--wrap)) / 2) + 2.5rem);
   will-change: transform;
 }
 /* rail cards: fixed width, compact fixed-height media so the whole card

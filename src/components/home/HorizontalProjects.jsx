@@ -26,8 +26,12 @@ export default function HorizontalProjects({ projects }) {
 
     const deskMq = window.matchMedia('(min-width: 900px) and (pointer: fine)')
     const reducedMq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    // Vertical scroll spent per unit of horizontal rail travel. >1 slows the
+    // rail down (you scroll further to move the cards the same distance).
+    const SCROLL_FACTOR = 1.8
     let enabled = false
     let maxShift = 0
+    let scrollLen = 0
     let rafId = 0
     let ticking = false
 
@@ -35,9 +39,11 @@ export default function HorizontalProjects({ projects }) {
       // Horizontal distance the rail must travel = content width beyond the
       // visible viewport. Unaffected by the current transform (layout width).
       maxShift = Math.max(0, row.scrollWidth - viewport.clientWidth)
+      scrollLen = maxShift * SCROLL_FACTOR
       if (enabled && maxShift > 24) {
-        // Give the sticky pin exactly `maxShift` of vertical scroll room.
-        outer.style.height = `${Math.round(window.innerHeight + maxShift)}px`
+        // Give the sticky pin `scrollLen` of vertical scroll room for `maxShift`
+        // of horizontal travel — the ratio is what sets the rail's speed.
+        outer.style.height = `${Math.round(window.innerHeight + scrollLen)}px`
       } else {
         outer.style.height = ''
         row.style.transform = ''
@@ -48,7 +54,7 @@ export default function HorizontalProjects({ projects }) {
       ticking = false
       if (!enabled || maxShift <= 24) return
       const top = outer.getBoundingClientRect().top
-      const progress = Math.min(1, Math.max(0, -top / maxShift))
+      const progress = Math.min(1, Math.max(0, -top / scrollLen))
       row.style.transform = `translate3d(${(-progress * maxShift).toFixed(1)}px, 0, 0)`
     }
 
