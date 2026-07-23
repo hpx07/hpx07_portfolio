@@ -323,11 +323,10 @@ button { font: inherit; cursor: pointer; }
   display: flex;
   align-items: center;
   gap: 0.65rem;
-  /* Brush-script wordmark; falls back to the display serif. */
-  font-family: var(--font-logo), var(--font-display);
-  font-weight: 400;
-  font-size: 1.3rem;
-  letter-spacing: 0.01em;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.15rem;
+  letter-spacing: 0.02em;
 }
 .brand img { height: 30px; width: auto; }
 .nav-links { display: flex; align-items: center; gap: 1.9rem; }
@@ -1162,7 +1161,7 @@ a.tag:hover, .tag.active { color: var(--amber); border-color: var(--amber); }
   align-items: start;
 }
 .footer-brand { max-width: 42ch; }
-.footer-logo { font-family: var(--font-logo), var(--font-display); font-size: 1.4rem; font-weight: 400; }
+.footer-logo { font-family: var(--font-display); font-size: 1.25rem; font-weight: 600; }
 .footer-desc { color: var(--muted); font-size: 0.92rem; line-height: 1.65; margin-top: 1.1rem; }
 .footer-socials { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.7rem; }
 .social-btn {
