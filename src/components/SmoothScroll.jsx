@@ -20,7 +20,14 @@ export default function SmoothScroll() {
     const coarse = window.matchMedia('(pointer: coarse)').matches
     if (reduced || coarse || root.dataset.fx === 'lite') return
 
-    const EASE = 0.11
+    // We own the smoothing now. The stylesheet sets `html { scroll-behavior:
+    // smooth }`, which would make the browser run its OWN animation on every
+    // per-frame scrollTo() below — the two fight and the scroll rubber-bands.
+    // Force instant scrolling while mounted; restore on cleanup.
+    const prevScrollBehavior = root.style.scrollBehavior
+    root.style.scrollBehavior = 'auto'
+
+    const EASE = 0.14
     let target = window.scrollY
     let current = target
     let running = false
@@ -105,6 +112,7 @@ export default function SmoothScroll() {
       window.removeEventListener('wheel', onWheel)
       window.removeEventListener('scroll', onScroll)
       cancelAnimationFrame(rafId)
+      root.style.scrollBehavior = prevScrollBehavior
     }
   }, [])
 
