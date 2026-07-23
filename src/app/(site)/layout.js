@@ -2,6 +2,7 @@ import { getSettings, listSocials } from '@/lib/repos'
 import SiteHeader from '@/components/SiteHeader'
 import SiteFooter from '@/components/SiteFooter'
 import ScrollFX from '@/components/ScrollFX'
+import SmoothScroll from '@/components/SmoothScroll'
 import CommandPalette from '@/components/CommandPalette'
 import { JsonLd, orgJsonLd } from '@/lib/seo'
 
@@ -27,6 +28,7 @@ export default async function SiteLayout({ children }) {
       <SiteHeader settings={headerSettings} />
       <main>{children}</main>
       <SiteFooter settings={settings} socials={socials} />
+      <SmoothScroll />
       <ScrollFX />
       <CommandPalette pages={settings.pages} />
       <JsonLd data={orgJsonLd(settings, socials)} />

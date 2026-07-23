@@ -21,6 +21,11 @@
   --amber: #ffb224;
   --ember: #ff6b35;
   --rose: #ff4d8d;
+  /* rgb channels of the three accents — let decorative rgba() glows follow
+     the active theme (see [data-theme='pine']). Same values as the hexes above. */
+  --amber-rgb: 255, 178, 36;
+  --ember-rgb: 255, 107, 53;
+  --rose-rgb: 255, 77, 141;
   --good: #3ecf8e;
   --bad: #ff5c5c;
   --warn: #ffc400;
@@ -56,6 +61,9 @@
   --amber: #a86000;
   --ember: #cf4a0e;
   --rose: #bb2560;
+  --amber-rgb: 168, 96, 0;
+  --ember-rgb: 207, 74, 14;
+  --rose-rgb: 187, 37, 96;
   --good: #147a4d;
   --bad: #c33434;
   --warn: #8f6b00;
@@ -65,6 +73,40 @@
   --chip-veil: rgba(255, 255, 255, 0.72);
   --veil: rgba(15, 15, 18, 0.4);
   color-scheme: light;
+}
+
+/* ── deep theme = "Pine & Cobalt" ─────────────────────────────
+   Minimalist third theme. Deep pine-green base with cobalt blue as the
+   primary interactive accent and pine-green surfaces for depth. Every
+   value below is drawn from the supplied palette (greens #0b1311 / #1e4137,
+   blues #0967d6 / #0a59a3 / #539fe3 / #bad6ff, neutrals #99a1af / #6a7282 /
+   #ccc / #fafafa / #101010). The semantic status colors (--good/--bad/--warn)
+   are intentionally left unset so they inherit the dark defaults and keep
+   up/down states legible. */
+[data-theme='pine'] {
+  --bg: #0b1311;
+  --bg-2: #101010;
+  --bg-3: #1e4137;
+  --card: #101010;
+  --line: rgba(153, 161, 175, 0.13);
+  --line-strong: rgba(153, 161, 175, 0.26);
+  --ink: #fafafa;
+  --ink-inverse: #0b1311;
+  --muted: #99a1af;
+  --faint: #6a7282;
+  --prose: #cccccc;
+  --amber: #539fe3;
+  --ember: #0967d6;
+  --rose: #1e4137;
+  --amber-rgb: 83, 159, 227;
+  --ember-rgb: 9, 103, 214;
+  --rose-rgb: 30, 65, 55;
+  --grad: linear-gradient(100deg, #bad6ff, #539fe3 45%, #0967d6);
+  --nav-veil: rgba(11, 19, 17, 0.82);
+  --menu-veil: rgba(11, 19, 17, 0.97);
+  --chip-veil: #1e4137cc;
+  --veil: rgba(11, 19, 17, 0.72);
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -466,8 +508,8 @@ button { font: inherit; cursor: pointer; }
   inset: 0;
   z-index: 0;
   background:
-    radial-gradient(60% 60% at 22% 12%, rgba(255, 178, 36, 0.10), transparent 60%),
-    radial-gradient(55% 55% at 82% 84%, rgba(255, 77, 141, 0.09), transparent 60%);
+    radial-gradient(60% 60% at 22% 12%, rgba(var(--amber-rgb), 0.10), transparent 60%),
+    radial-gradient(55% 55% at 82% 84%, rgba(var(--rose-rgb), 0.09), transparent 60%);
   pointer-events: none;
 }
 [data-theme='light'] .worked::before {
@@ -557,7 +599,7 @@ button { font: inherit; cursor: pointer; }
 .stat {
   padding: 2.2rem 1.8rem;
   border-right: 1px solid var(--line);
-  background: linear-gradient(160deg, rgba(255, 178, 36, 0.03), transparent 45%);
+  background: linear-gradient(160deg, rgba(var(--amber-rgb), 0.03), transparent 45%);
 }
 .stat:last-child { border-right: 0; }
 .stat b {
@@ -702,7 +744,7 @@ button { font: inherit; cursor: pointer; }
   scroll-snap-align: start;
   transition: border-color 0.35s, background 0.35s;
 }
-.hscroll-end:hover { border-color: var(--amber); background: rgba(255, 178, 36, 0.05); }
+.hscroll-end:hover { border-color: var(--amber); background: rgba(var(--amber-rgb), 0.05); }
 .hscroll-end-label { font-family: var(--font-display); font-size: 1.7rem; line-height: 1.1; }
 .hscroll-end-arrow { font-family: var(--font-mono); color: var(--amber); font-size: 1.4rem; }
 
@@ -779,13 +821,13 @@ button { font: inherit; cursor: pointer; }
   overflow: hidden;
   transition: border-color 0.35s, transform 0.45s var(--ease);
 }
-.step-card:hover { border-color: rgba(255, 178, 36, 0.4); transform: translateY(-4px); }
+.step-card:hover { border-color: rgba(var(--amber-rgb), 0.4); transform: translateY(-4px); }
 .step-card .num {
   font-family: var(--font-display);
   font-style: italic;
   font-size: 2.6rem;
   color: transparent;
-  -webkit-text-stroke: 1px rgba(255, 178, 36, 0.45);
+  -webkit-text-stroke: 1px rgba(var(--amber-rgb), 0.45);
   display: block;
   line-height: 1;
   margin-bottom: 1rem;
@@ -808,12 +850,12 @@ button { font: inherit; cursor: pointer; }
 }
 .plan-card:hover { transform: translateY(-6px); }
 .plan-card.hot {
-  border-color: rgba(255, 178, 36, 0.55);
+  border-color: rgba(var(--amber-rgb), 0.55);
   background:
     linear-gradient(var(--card), var(--card)) padding-box,
     var(--grad) border-box;
   border: 1px solid transparent;
-  box-shadow: 0 24px 60px -32px rgba(255, 107, 53, 0.35);
+  box-shadow: 0 24px 60px -32px rgba(var(--ember-rgb), 0.35);
 }
 .plan-badge {
   position: absolute;
@@ -997,7 +1039,7 @@ a.tag:hover, .tag.active { color: var(--amber); border-color: var(--amber); }
   border-radius: calc(var(--radius) + 6px);
   padding: 3rem;
   background:
-    radial-gradient(700px 340px at 90% -10%, rgba(255, 107, 53, 0.09), transparent),
+    radial-gradient(700px 340px at 90% -10%, rgba(var(--ember-rgb), 0.09), transparent),
     var(--card);
 }
 .contact-panel h2 {
@@ -1033,7 +1075,7 @@ a.tag:hover, .tag.active { color: var(--amber); border-color: var(--amber); }
 .field input:focus, .field textarea:focus, .field select:focus {
   outline: none;
   border-color: var(--amber);
-  box-shadow: 0 0 0 3px rgba(255, 178, 36, 0.15);
+  box-shadow: 0 0 0 3px rgba(var(--amber-rgb), 0.15);
 }
 .form-note { font-size: 0.85rem; color: var(--faint); margin-top: 0.8rem; }
 .form-ok { color: var(--good); }
@@ -1258,7 +1300,7 @@ a.tag:hover, .tag.active { color: var(--amber); border-color: var(--amber); }
 .a-badge.ok { color: var(--good); border-color: rgba(62, 207, 142, 0.4); }
 .a-badge.err { color: var(--bad); border-color: rgba(255, 92, 92, 0.4); }
 .a-badge.warn { color: var(--warn); border-color: rgba(255, 196, 0, 0.4); }
-.a-badge.hot { color: var(--amber); border-color: rgba(255, 178, 36, 0.5); }
+.a-badge.hot { color: var(--amber); border-color: rgba(var(--amber-rgb), 0.5); }
 
 .switch { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
 .switch input { opacity: 0; width: 100%; height: 100%; position: absolute; cursor: pointer; z-index: 2; margin: 0; }
@@ -1279,7 +1321,7 @@ a.tag:hover, .tag.active { color: var(--amber); border-color: var(--amber); }
   background: var(--muted);
   transition: transform 0.25s var(--ease), background 0.25s;
 }
-.switch input:checked + i { background: rgba(255, 178, 36, 0.25); border-color: var(--amber); }
+.switch input:checked + i { background: rgba(var(--amber-rgb), 0.25); border-color: var(--amber); }
 .switch input:checked + i::after { transform: translateX(18px); background: var(--amber); }
 
 .a-modal-overlay {
@@ -1320,7 +1362,7 @@ a.tag:hover, .tag.active { color: var(--amber); border-color: var(--amber); }
 .bar-chart { display: flex; align-items: flex-end; gap: 3px; height: 160px; }
 .bar-chart .bar {
   flex: 1;
-  background: linear-gradient(to top, rgba(255, 178, 36, 0.85), rgba(255, 107, 53, 0.55));
+  background: linear-gradient(to top, rgba(var(--amber-rgb), 0.85), rgba(var(--ember-rgb), 0.55));
   border-radius: 3px 3px 0 0;
   min-height: 2px;
   position: relative;
@@ -1354,7 +1396,7 @@ a.tag:hover, .tag.active { color: var(--amber); border-color: var(--amber); }
   align-items: center;
   justify-content: center;
   background:
-    radial-gradient(800px 400px at 70% 10%, rgba(255, 107, 53, 0.07), transparent),
+    radial-gradient(800px 400px at 70% 10%, rgba(var(--ember-rgb), 0.07), transparent),
     var(--bg);
 }
 .login-card {
@@ -1411,11 +1453,11 @@ a.tag:hover, .tag.active { color: var(--amber); border-color: var(--amber); }
      flat panel melting into the page. Accent: ember #ff6b35 over card. */
   .proj-card {
     background:
-      linear-gradient(158deg, rgba(255, 107, 53, 0.12), rgba(255, 178, 36, 0.05) 34%, var(--card) 68%);
+      linear-gradient(158deg, rgba(var(--ember-rgb), 0.12), rgba(var(--amber-rgb), 0.05) 34%, var(--card) 68%);
     border-color: var(--line-strong);
-    box-shadow: 0 14px 34px -26px rgba(255, 107, 53, 0.5);
+    box-shadow: 0 14px 34px -26px rgba(var(--ember-rgb), 0.5);
   }
-  .proj-card .proj-body h3 { border-bottom-color: rgba(255, 107, 53, 0.28); }
+  .proj-card .proj-body h3 { border-bottom-color: rgba(var(--ember-rgb), 0.28); }
   .proj-cat { background: rgba(2, 2, 2, 0.82); }
   [data-theme='light'] .proj-card {
     background:

@@ -21,7 +21,7 @@ export const DEFAULT_SETTINGS = {
   logo_text: 'HPX.DEV',
   favicon_url: '',
   footer_note: 'Designed & engineered by HPX Studio. No templates were harmed.',
-  // 'dark' | 'light' — starting theme for first-time visitors (they can toggle)
+  // 'dark' | 'light' | 'pine' — starting theme for first-time visitors (they can toggle)
   default_theme: 'dark',
 
   // Page + section switches — flip any of these off from Admin → Settings.

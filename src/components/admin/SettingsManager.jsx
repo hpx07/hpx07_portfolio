@@ -162,11 +162,12 @@ export default function SettingsManager() {
               <label htmlFor="s-default_theme">Default theme for new visitors</label>
               <select
                 id="s-default_theme"
-                value={form.default_theme === 'light' ? 'light' : 'dark'}
+                value={['light', 'pine'].includes(form.default_theme) ? form.default_theme : 'dark'}
                 onChange={(e) => set('default_theme', e.target.value)}
               >
                 <option value="dark">Dark — Ember & Ivory</option>
                 <option value="light">Light — Ivory Ledger</option>
+                <option value="pine">Deep — Pine &amp; Cobalt</option>
               </select>
             </div>
           </div>
