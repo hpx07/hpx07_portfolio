@@ -323,18 +323,13 @@ button { font: inherit; cursor: pointer; }
   display: flex;
   align-items: center;
   gap: 0.65rem;
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 1.15rem;
-  letter-spacing: 0.02em;
+  /* Orbitron = geometric tech wordmark; falls back to the display serif. */
+  font-family: var(--font-logo), var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 0.04em;
 }
 .brand img { height: 30px; width: auto; }
-.brand-dot {
-  width: 9px; height: 9px;
-  border-radius: 50%;
-  background: var(--grad);
-  box-shadow: 0 0 14px var(--ember);
-}
 .nav-links { display: flex; align-items: center; gap: 1.9rem; }
 .nav-links a {
   font-size: 0.88rem;

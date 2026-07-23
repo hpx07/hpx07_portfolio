@@ -38,7 +38,6 @@ export default function SiteHeader({ settings }) {
               <img src={settings.logo_url} alt={settings.site_name} />
             ) : (
               <>
-                <span className="brand-dot" aria-hidden="true" />
                 <span>{settings.logo_text || settings.site_name}</span>
               </>
             )}

@@ -146,10 +146,7 @@ export default function SiteFooter({ settings, socials = [] }) {
               {settings.logo_url ? (
                 <img src={settings.logo_url} alt={settings.site_name} />
               ) : (
-                <>
-                  <span className="brand-dot" aria-hidden="true" />
-                  <span>{settings.logo_text || settings.site_name}</span>
-                </>
+                <span>{settings.logo_text || settings.site_name}</span>
               )}
             </Link>
             {description && <p className="footer-desc">{description}</p>}

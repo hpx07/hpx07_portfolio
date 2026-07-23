@@ -1,5 +1,5 @@
 import './globals.css'
-import { Fraunces, Archivo, JetBrains_Mono } from 'next/font/google'
+import { Fraunces, Archivo, JetBrains_Mono, Orbitron } from 'next/font/google'
 import { getSettings } from '@/lib/repos'
 import { buildMetadata } from '@/lib/seo'
 import Analytics from '@/components/Analytics'
@@ -24,6 +24,13 @@ const jetbrainsMono = JetBrains_Mono({
   display: 'swap',
   variable: '--font-jbmono',
 })
+// Geometric tech wordmark for the HPX.DEV logo (BROLINK-style).
+const orbitron = Orbitron({
+  subsets: ['latin'],
+  weight: ['600', '700'],
+  display: 'swap',
+  variable: '--font-logo',
+})
 
 export async function generateMetadata() {
   const settings = await getSettings()
@@ -43,7 +50,7 @@ export default async function RootLayout({ children }) {
       data-theme={defaultTheme}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
-      className={`${fraunces.variable} ${archivo.variable} ${jetbrainsMono.variable}`}
+      className={`${fraunces.variable} ${archivo.variable} ${jetbrainsMono.variable} ${orbitron.variable}`}
     >
       <head>
         {/* apply the visitor's theme + reduce fx for low-end/reduced-motion devices before first paint */}
